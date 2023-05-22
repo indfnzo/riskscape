@@ -1,0 +1,6 @@
+@import "styles/normalize.css";
+
+html, body {
+	font-size: 16px;
+	font-family: 'Manrope', sans-serif;
+}

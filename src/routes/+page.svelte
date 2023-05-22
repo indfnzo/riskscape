@@ -1,13 +1,13 @@
 <script lang="ts">
-	import { MapView, LogoSection, BuildingsSection, ActionsSection } from "$lib/components";
+	import { MapView, LogoSection, BuildingsSection, NewBuildingAction } from "$lib/components";
 </script>
 
-<MapView fullscreen />
-<LogoSection />
-<BuildingsSection />
-<ActionsSection />
-
-<div class="map-overlay"></div>
+<MapView fullscreen>
+    <LogoSection />
+    <BuildingsSection />
+    <NewBuildingAction />
+    <div class="map-overlay"></div>
+</MapView>
 
 <style>
     .map-overlay {

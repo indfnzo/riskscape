@@ -1,22 +1,39 @@
+<script lang="ts" context="module">
+	import type { Writable } from 'svelte/store';
+	export type MapContext = {
+		map: Writable<Map>;
+	};
+</script>
+
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, setContext } from 'svelte';
 	import mapboxgl, { Map } from 'mapbox-gl';
+	import { writable } from 'svelte/store';
 
 	export let fullscreen = false;
 
 	let container: HTMLElement;
-	let map: Map;
+	let map = writable<Map>();
 
 	onMount(() => {
 		mapboxgl.accessToken = 'pk.eyJ1IjoiamVtaHVudHIiLCJhIjoiY2pna2lsanZoMDNyazJxcGhmY2VmdXMxYyJ9.jxMc5d4I-5Zevyny5tujaw';
-		map = new Map({
+		$map = new Map({
 			container,
 			style: 'mapbox://styles/jemhuntr/clhwms7i800ph01pzfjkfdrh6',
+			attributionControl: false,
 		});
 	});
+
+	export const mapContext: MapContext = {
+		map,
+	};
+
+	setContext('map', mapContext);
 </script>
 
 <div bind:this={container} class="map-view" class:fullscreen></div>
+
+<slot></slot>
 
 <style>
 	.map-view {

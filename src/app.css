@@ -1,6 +1,22 @@
 @import "styles/normalize.css";
 
+:root {
+	--theme-focus: #0B1320;
+}
+
 html, body {
-	font-size: 16px;
+	font-size: 12px;
 	font-family: 'Manrope', sans-serif;
+}
+
+@media (min-width: 320px) {
+	html, body { font-size: 13px; }
+}
+
+@media (min-width: 640px) {
+	html, body { font-size: 14px; }
+}
+
+@media (min-width: 1280px) {
+	html, body { font-size: 16px; }
 }

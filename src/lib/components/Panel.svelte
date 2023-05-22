@@ -6,6 +6,6 @@
     .panel {
         background: white;
         padding: 1.5rem 2rem;
-        border-radius: 5px;
+        border-radius: 0.5rem;
     }
 </style>

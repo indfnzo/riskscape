@@ -11,7 +11,5 @@ export async function GET() {
         });
     } catch {
         throw error(400, 'beep boop');
-    } finally {
-        await prisma.$disconnect();
     }
 }

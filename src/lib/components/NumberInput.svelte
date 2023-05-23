@@ -3,11 +3,12 @@
 
 	export let label = '';
 	export let placeholder = '';
-	export let value = '';
+	export let value = 0;
 	export let name = '';
 	export let disabled = false;
+	export let step = '';
 </script>
 
 <FormControl {label} let:id>
-	<input {id} type="text" bind:value {name} {placeholder} {disabled} />
+	<input {id} type="number" bind:value {name} {placeholder} {disabled} {step} />
 </FormControl>

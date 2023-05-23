@@ -2,6 +2,11 @@
 
 :root {
 	--theme-focus: #0B1320;
+	--theme-accent: #213F60;
+	--theme-error: #B12020;
+
+	--theme-seismic-zone-2: #D4A52B;
+	--theme-seismic-zone-4: #C53333;
 }
 
 html, body {

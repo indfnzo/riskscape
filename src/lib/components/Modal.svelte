@@ -127,27 +127,27 @@
 		z-index: 100;
 		min-height: 100vh;
 
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: flex-end;
-
 		overflow: auto;
 		background: rgb(0 0 0 / 50%);
 	}
 
 	.frame-wrapper {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: flex-end;
 		position: relative;
-		margin: 4rem 0;
-		width: 32rem;
+		margin: 8rem auto 4rem;
+		width: 64rem;
 		max-width: calc(100% - 4rem);
+		min-height: calc(100% - 12rem);
 	}
 
 	.modal-frame {
-		padding: 2rem;
+		width: 100%;
 		background: white;
 		color: black;
-
+		overflow: hidden;
 		border-radius: 0.5rem;
 	}
 

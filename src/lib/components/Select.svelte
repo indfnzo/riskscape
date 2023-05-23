@@ -2,12 +2,13 @@
 	import { FormControl } from '.';
 
 	export let label = '';
-	export let placeholder = '';
 	export let value = '';
 	export let name = '';
 	export let disabled = false;
 </script>
 
 <FormControl {label} let:id>
-	<input {id} type="text" bind:value {name} {placeholder} {disabled} />
+	<select {id} bind:value {name} {disabled}>
+		<slot></slot>
+	</select>
 </FormControl>

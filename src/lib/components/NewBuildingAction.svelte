@@ -5,6 +5,7 @@
 	import { LngLat, Marker } from 'mapbox-gl';
 	import type { Building } from '@prisma/client';
     import { fetchBuildings } from '$lib/stores';
+	import { sleep } from '$lib/helpers';
 
     const mapContext = getContext<MapContext>('map');
     const { map } = mapContext;
@@ -67,6 +68,7 @@
 
     const promptLocation = async () => {
         modalContext.modal.close();
+        await sleep(250);
 
         const currentLocation = building.lat && building.lng ? new LngLat(building.lng, building.lat) : undefined;
 

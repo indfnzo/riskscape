@@ -221,12 +221,6 @@
 		outline: none;
 	}
 
-	:global(.building-popup .mapboxgl-popup-tip) {
-		border: 6px solid transparent;
-		border-bottom: none;
-	    border-top-color: #f7f7f7;
-	}
-
 	/* inner map elements */
 
 	.map-elements {

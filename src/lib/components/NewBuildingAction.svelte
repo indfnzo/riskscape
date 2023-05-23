@@ -4,6 +4,7 @@
 	import type { MapContext } from './MapView.svelte';
 	import { LngLat, Marker } from 'mapbox-gl';
 	import type { Building } from '@prisma/client';
+    import { fetchBuildings } from '$lib/stores';
 
     const mapContext = getContext<MapContext>('map');
     const { map } = mapContext;
@@ -101,6 +102,7 @@
             resetForm();
             modalContext.modal.close();
             $map.flyTo({ center, zoom: 19, pitch: 45 })
+            fetchBuildings();
         } else {
             error = data.message || 'Failed to create building record.';
         }

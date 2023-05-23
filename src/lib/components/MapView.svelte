@@ -12,6 +12,7 @@
 	import mapboxgl, { Map, Marker, Popup } from 'mapbox-gl';
 	import { writable } from 'svelte/store';
 	import { buildings } from '$lib/stores';
+	import type { Building } from '@prisma/client';
 
 	export let fullscreen = false;
 
@@ -19,17 +20,8 @@
 	let map = writable<Map>();
 	let buildingMarkers: { id: number, marker: Marker, popup: Popup }[] = [];
 
-	// set up map view
-	onMount(() => {
-		// init map
-		mapboxgl.accessToken = 'pk.eyJ1IjoiamVtaHVudHIiLCJhIjoiY2pna2lsanZoMDNyazJxcGhmY2VmdXMxYyJ9.jxMc5d4I-5Zevyny5tujaw';
-		$map = new Map({
-			container,
-			style: 'mapbox://styles/jemhuntr/clhwms7i800ph01pzfjkfdrh6',
-			attributionControl: false,
-		});
-
-		// add all building markers & popups
+	// render all building markers & popups
+	const updateMarkers = (buildings: Building[]) => {
 		for (const bldg of $buildings) {
 			const popup = new Popup({ offset: 16, className: 'building-popup' }).setHTML(`
 				<div class="content">
@@ -50,6 +42,21 @@
 
 			buildingMarkers.push({ id: bldg.id, marker, popup });
 		}
+	}
+
+	// set up map view
+	onMount(() => {
+		// init map
+		mapboxgl.accessToken = 'pk.eyJ1IjoiamVtaHVudHIiLCJhIjoiY2pna2lsanZoMDNyazJxcGhmY2VmdXMxYyJ9.jxMc5d4I-5Zevyny5tujaw';
+		$map = new Map({
+			container,
+			style: 'mapbox://styles/jemhuntr/clhwms7i800ph01pzfjkfdrh6',
+			attributionControl: false,
+		});
+
+		// render markers & rerender when buildings are re-fetched
+		updateMarkers($buildings);
+		buildings.subscribe(updateMarkers);
 	});
 
 	// hide everything and prompt for a manual location selection

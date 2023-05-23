@@ -1,9 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '$lib/server';
 
 export async function GET() {
-    const prisma = new PrismaClient();
-
     try {
         const buildings = await prisma.building.findMany();
         return new Response(JSON.stringify(buildings), {

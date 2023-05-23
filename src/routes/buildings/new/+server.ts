@@ -1,9 +1,8 @@
 import { error } from '@sveltejs/kit';
-import { PrismaClient, type Building } from '@prisma/client';
+import { prisma } from '$lib/server';
+import type { Building } from '@prisma/client';
 
 export async function POST({ request }) {
-    const prisma = new PrismaClient();
-
     const data: Partial<Building> = await request.json();
 
     // manual validation

@@ -11,7 +11,7 @@
         </h1>
     </div>
 
-    <img src="/aff.png" alt="Affiliations">
+    <img style="height: 3rem;" src="/aff.png" alt="Affiliations">
 </section>
 
 <style>
@@ -41,7 +41,7 @@
         font-weight: 900;
     }
 
-    @media (max-width: 640px) {
+    @media (max-width: 639px) {
         .logo-section h1 {
             display: none;
         }

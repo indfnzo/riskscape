@@ -10,11 +10,16 @@
 }
 
 html, body {
-	font-size: 12px;
+	font-size: 11px;
 	font-family: 'Manrope', sans-serif;
+	background: #1a1a1a;
 }
 
 @media (min-width: 320px) {
+	html, body { font-size: 12px; }
+}
+
+@media (min-width: 480px) {
 	html, body { font-size: 13px; }
 }
 
@@ -24,4 +29,13 @@ html, body {
 
 @media (min-width: 1280px) {
 	html, body { font-size: 16px; }
+}
+
+/* other generic styles */
+
+hr {
+	display: block;
+	width: 100%;
+	border: none;
+	border-top: 1px solid rgb(0 0 0 / 10%);
 }

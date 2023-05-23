@@ -20,7 +20,7 @@
         backdrop-filter: blur(5px);
     }
 
-    @media (min-width: 641px) {
+    @media (min-width: 640px) {
         .buildings-section {
             right: auto;
             width: 32rem;
@@ -49,6 +49,8 @@
         position: absolute;
         top: 1rem;
         right: 1.5rem;
+        width: 1.5rem;
+        height: 1.5rem;
         opacity: 0.25;
         pointer-events: none;
     }

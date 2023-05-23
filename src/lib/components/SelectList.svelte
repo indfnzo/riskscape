@@ -25,9 +25,10 @@
 </script>
 
 <div class="select-list">
-	{#if label}
-		<div class="label">{label}</div>
-	{/if}
+	<div class="label">
+		<strong>{label}</strong>
+		(pick one)
+	</div>
 	<slot></slot>
 </div>
 
@@ -39,6 +40,12 @@
 
 	.label {
 		font-size: 0.8rem;
+		font-weight: 500;
+		color: rgb(0 0 0 / 50%);
+	}
+
+	.label strong {
 		font-weight: 700;
+		color: black;
 	}
 </style>

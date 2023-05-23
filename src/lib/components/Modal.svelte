@@ -139,7 +139,7 @@
 		position: relative;
 		margin: 8rem auto 4rem;
 		width: 64rem;
-		max-width: calc(100% - 4rem);
+		max-width: calc(100% - 2rem);
 		min-height: calc(100% - 12rem);
 	}
 

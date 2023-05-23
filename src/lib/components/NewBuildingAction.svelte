@@ -173,10 +173,11 @@
                                 High probability of damaging ground motion.
                             </SelectListItem>
                         </SelectList>
+                        <hr />
                         <div class="control-group">
-                            <NumberInput label="Distance from Fault Line (km)" step="0.001" bind:value={building.distanceFromFaultLine} />
+                            <NumberInput label="Distance from Fault Line (km)" placeholder="0.00" step="0.001" bind:value={building.distanceFromFaultLine} />
                             <Select label="Soil Type" bind:value={building.soilType}>
-                                <option value="">Soil Type</option>
+                                <option value="" disabled>Soil Type</option>
                                 <option value="SA">SA (Hard rock)</option>
                                 <option value="SB">SB (Rock)</option>
                                 <option value="SC">SC (Very dense soil and soft rock)</option>

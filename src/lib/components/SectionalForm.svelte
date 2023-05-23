@@ -44,7 +44,7 @@
         }
 
         .sectional-form :global(section) {
-            grid-template-columns: 16rem 1fr;
+            grid-template-columns: 12rem 1fr;
         }
 
         .sectional-form :global(aside) {
@@ -69,6 +69,12 @@
         }
     }
 
+    @media (min-width: 960px) {
+        .sectional-form :global(section) {
+            grid-template-columns: 16rem 1fr;
+        }
+    }
+
     /* text styles */
 
     .sectional-form :global(aside h3) {
@@ -85,7 +91,14 @@
     /* horizontal form groups */
 
     .sectional-form :global(.control-group) {
-        display: flex;
+        display: grid;
         gap: 1rem;
+    }
+
+    @media (min-width: 720px) {
+        .sectional-form :global(.control-group) {
+            display: flex;
+            gap: 1rem;
+        }
     }
 </style>

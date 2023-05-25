@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	import type { Writable } from 'svelte/store';
-	import type { LngLat } from 'mapbox-gl';
+	import type { LngLat, PaddingOptions } from 'mapbox-gl';
 	export type MapContext = {
 		map: Writable<Map>;
 		promptLocation: (currentLocation?: LngLat) => Promise<LngLat | void>;
@@ -11,18 +11,24 @@
 	import { onMount, setContext } from 'svelte';
 	import mapboxgl, { Map, Marker, Popup } from 'mapbox-gl';
 	import { writable } from 'svelte/store';
-	import { buildings } from '$lib/stores';
+	import { buildings, buildingsSearchState, selectedBuilding, selectBuilding } from '$lib/stores';
 	import type { Building } from '@prisma/client';
+	import { getSidebarAwareMapPadding, getStandardPadding } from '$lib/helpers';
 
 	export let fullscreen = false;
 
 	let container: HTMLElement;
 	let map = writable<Map>();
-	let buildingMarkers: { id: number, marker: Marker, popup: Popup }[] = [];
+	let buildingMarkers: Record<number, { marker: Marker, popup: Popup }> = {};
 
-	// render all building markers & popups
-	const updateMarkers = (buildings: Building[]) => {
-		for (const bldg of $buildings) {
+	// rerender all building markers & popups
+	const updateMarkers = (bldgs: Building[]) => {
+		// remove all existing markers and truncate the registry
+		for (const [id, entry] of Object.entries(buildingMarkers)) entry.marker.remove();
+		buildingMarkers = {};
+
+		// rerender markers & popups
+		for (const bldg of bldgs) {
 			const popup = new Popup({ offset: 16, className: 'building-popup' }).setHTML(`
 				<div class="content">
 					<div class="name">${bldg.name}</div>
@@ -34,13 +40,82 @@
 				</div>
 			`);
 
-			const el = document.createElement('div');
+			const el = document.createElement('button');
 			el.className = 'building-marker zone-' + bldg.seismicZone;
 			el.title = bldg.name;
 			const center = { lat: bldg.lat, lng: bldg.lng };
 			const marker = new Marker(el).setLngLat(center).setPopup(popup).addTo($map);
 
-			buildingMarkers.push({ id: bldg.id, marker, popup });
+			// show popup on hover
+			el.addEventListener('mouseenter', () => popup.addTo($map));
+			el.addEventListener('mouseleave', () => popup.remove());
+
+			// disable double click to zoom
+			el.addEventListener('dblclick', (evt) => {
+				evt.preventDefault();
+				evt.stopPropagation();
+			});
+
+			// activate on click
+			el.addEventListener('click', (evt) => {
+				selectBuilding(bldg);
+				evt.preventDefault();
+			});
+
+			buildingMarkers[bldg.id] = { marker, popup };
+		}
+	}
+
+	// go through all markers & update hidden state based on search
+	const updateBuildingSearchState = () => {
+		const filteredBuildings = $buildingsSearchState.results;
+		const filteredBuildingIds = filteredBuildings.map(bldg => bldg.building.id);
+
+		// set marker hidden states
+		for (const [id, entry] of Object.entries(buildingMarkers)) {
+			const el = entry.marker.getElement();
+			if ($buildingsSearchState.active && !filteredBuildingIds.includes(parseInt(id))) el.classList.add('hidden');
+			else el.classList.remove('hidden');
+		}
+
+		// if singular result, fly to it on the map
+		if (filteredBuildingIds.length === 1) {
+			const center = {
+				lat: filteredBuildings[0].building.lat,
+				lng: filteredBuildings[0].building.lng,
+			};
+			$map.flyTo({
+				center,
+				pitch: 0,
+				zoom: 16,
+				padding: getSidebarAwareMapPadding()
+			});
+		}
+
+		// if more than 1 result, fit map to all active markers
+		if (filteredBuildingIds.length >= 2) {
+			let minLng = Infinity, maxLng = 0, minLat = Infinity, maxLat = 0;
+
+			for (const { building } of filteredBuildings) {
+				if (building.lng < minLng) minLng = building.lng;
+				if (building.lng > maxLng) maxLng = building.lng;
+				if (building.lat < minLat) minLat = building.lat;
+				if (building.lat > maxLat) maxLat = building.lat;
+			}
+
+			/**
+			 * Note: We can't pass the padding options to `fitBounds` since it doesn't persist that value (or even use the global option)
+			 * like `flyTo` does. So we set the padding globally first, then we use `fitBounds` to apply the view.
+			 * See: https://github.com/mapbox/mapbox-gl-js/issues/12498
+			 */
+			$map.setPadding(getSidebarAwareMapPadding());
+			$map.fitBounds([
+				[maxLng, minLat],
+				[minLng, maxLat]
+			], {
+				animate: true,
+				pitch: 0,
+			});
 		}
 	}
 
@@ -57,6 +132,18 @@
 		// render markers & rerender when buildings are re-fetched
 		updateMarkers($buildings);
 		buildings.subscribe(updateMarkers);
+		buildingsSearchState.subscribe(updateBuildingSearchState);
+
+		// set default padding & zoom to fit whole Quezon City by default
+		$map.setPadding(getStandardPadding());
+		$map.fitBounds([
+			[121.134974, 14.588430],
+			[120.988718, 14.778065]
+		], {
+			animate: false,
+			pitch: 45,
+			center: [121.04932076975197, 14.651491937004637]
+		});
 	});
 
 	// hide everything and prompt for a manual location selection
@@ -64,7 +151,8 @@
 	let promptLastView: {
 		center: LngLat,
 		zoom: number,
-		pitch: number
+		pitch: number,
+		padding: PaddingOptions,
 	};
 	let resolvePrompt: (value: LngLat | void) => void;
 	const promptLocation = (currentLocation?: LngLat) => {
@@ -73,14 +161,15 @@
 		promptLastView = {
 			center: $map.getCenter(),
 			zoom: $map.getZoom(),
-			pitch: $map.getPitch()
+			pitch: $map.getPitch(),
+			padding: $map.getPadding(),
 		};
 
 		const center = currentLocation || $map.getCenter();
 		const zoom = currentLocation ? 18 : 16;
 		const pitch = 0;
 
-		$map.flyTo({ center, zoom, pitch });
+		$map.flyTo({ center, zoom, pitch, padding: getStandardPadding() });
 
 		return new Promise<LngLat | void>(resolve => {
 			resolvePrompt = resolve;
@@ -95,7 +184,7 @@
 
 	const acceptLocation = () => {
 		promptMode = false;
-		$map.flyTo({ center: $map.getCenter(), zoom: 17, pitch: 45 });
+		$map.flyTo({ center: $map.getCenter(), zoom: 17, pitch: 45, padding: getStandardPadding() });
 		resolvePrompt($map.getCenter());
 	}
 
@@ -142,13 +231,21 @@
 	/* custom building markers */
 
 	:global(.building-marker) {
-		width: 0.5rem;
-		height: 0.5rem;
+		display: block;
+		margin: 0;
+		padding: 0;
+		appearance: none;
+		width: 1rem;
+		height: 1rem;
 		border: 2px solid rgb(255 255 255 / 50%);
 		background: black;
 		border-radius: 50%;
 		box-shadow: 0 0 0 1px rgb(0 0 0 / 25%) inset, 0 3px 5px rgb(0 0 0 / 50%);
 		cursor: pointer;
+		
+		transition-property: width, height, border, background, box-shadow;
+		transition-duration: 100ms;
+		transition-timing-function: ease-out;
 	}
 
 	:global(.building-marker.zone-2) {
@@ -159,11 +256,33 @@
 		background: var(--theme-seismic-zone-4);
 	}
 
+	:global(.building-marker.hidden) {
+		width: 0.25rem;
+		height: 0.25rem;
+		border: none;
+		background: rgb(255 255 255 / 50%);
+		box-shadow: none;
+		pointer-events: none !important;
+	}
+
 	/* building popups */
 
 	:global(.building-popup) {
 		font-family: 'Manrope', sans-serif;
 		font-size: 1rem;
+		animation: popup-in 100ms ease-out forwards;
+	}
+
+	@keyframes popup-in {
+		from {
+			opacity: 0;
+			top: 0.5rem;
+		}
+
+		to {
+			opacity: 1;
+			top: 0;
+		}
 	}
 
 	:global(.building-popup .mapboxgl-popup-content) {
@@ -212,13 +331,7 @@
 	}
 
 	:global(.building-popup .mapboxgl-popup-close-button) {
-		padding: 0;
-		width: 2rem;
-		height: 2rem;
-		line-height: 2rem;
-		font-size: 1.5rem;
-		border-radius: 0;
-		outline: none;
+		display: none;
 	}
 
 	/* inner map elements */

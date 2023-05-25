@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { MapView, LogoSection, BuildingsSection, NewBuildingAction } from "$lib/components";
+	import { MapView } from '$lib/components';
+    import { HeaderView, BuildingsSearchView, SelectedBuildingView, NewBuildingView } from '$lib/views';
 </script>
 
 <MapView fullscreen>
-    <LogoSection />
-    <BuildingsSection />
-    <NewBuildingAction />
+    <HeaderView />
+    <SelectedBuildingView />
+    <BuildingsSearchView />
+    <NewBuildingView />
     <div class="map-overlay"></div>
 </MapView>
 

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { Logo } from ".";
+	import { Logo } from "$lib/components";
 </script>
 
-<section class="logo-section">
+<section class="header-view">
     <div class="left">
         <Logo />
         <h1>
@@ -15,7 +15,7 @@
 </section>
 
 <style>
-    .logo-section {
+    .header-view {
         position: fixed;
         left: 2rem;
         right: 2rem;
@@ -26,13 +26,13 @@
         color: white;
     }
 
-    .logo-section .left {
+    .left {
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
-    .logo-section h1 {
+    h1 {
         display: flex;
         flex-direction: column;
         gap: 0.25rem;
@@ -42,12 +42,12 @@
     }
 
     @media (max-width: 639px) {
-        .logo-section h1 {
+        h1 {
             display: none;
         }
     }
 
-    .logo-section h1 small {
+    h1 small {
         display: block;
         font-size: 0.8rem;
         text-transform: uppercase;

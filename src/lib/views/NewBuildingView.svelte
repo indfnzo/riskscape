@@ -1,11 +1,12 @@
 <script lang="ts">
     import { getContext } from 'svelte';
-    import { ModalContext, Modal, SectionalForm, Input, NumberInput, Button, Select, SelectList, SelectListItem } from '.';
-	import type { MapContext } from './MapView.svelte';
+	import { scale } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
+    import { ModalContext, Modal, SectionalForm, Input, NumberInput, Button, Select, SelectList, SelectListItem, type MapContext } from '$lib/components';
 	import { LngLat, Marker } from 'mapbox-gl';
 	import type { Building } from '@prisma/client';
-    import { fetchBuildings } from '$lib/stores';
-	import { sleep } from '$lib/helpers';
+    import { fetchBuildings, selectedBuilding } from '$lib/stores';
+	import { getStandardPadding, sleep } from '$lib/helpers';
 
     const mapContext = getContext<MapContext>('map');
     const { map } = mapContext;
@@ -103,7 +104,7 @@
 
             resetForm();
             modalContext.modal.close();
-            $map.flyTo({ center, zoom: 19, pitch: 45 })
+            $map.flyTo({ center, zoom: 19, pitch: 45, padding: getStandardPadding() })
             fetchBuildings();
         } else {
             error = data.message || 'Failed to create building record.';
@@ -113,14 +114,21 @@
     }
 </script>
 
-<section class="new-building-action">
+<section class="new-building-view">
     <ModalContext bind:this={modalContext} let:modal>
-        <button class="expand-button" on:click={modal.open} title="Submit New Building Record">
-            <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M4 12H20" stroke="currentColor" stroke-linecap="square"/>
-                <path d="M12 4L12 20" stroke="currentColor" stroke-linecap="square"/>
-            </svg>
-        </button>
+        {#if !$selectedBuilding}
+            <button
+                class="expand-button"
+                on:click={modal.open}
+                title="Submit New Building Record"
+                transition:scale|local={{ duration: 250, easing: quintOut }}
+            >
+                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4 12H20" stroke="currentColor" stroke-linecap="square"/>
+                    <path d="M12 4L12 20" stroke="currentColor" stroke-linecap="square"/>
+                </svg>
+            </button>
+        {/if}
 
         <Modal context={modal}>
             <SectionalForm onSubmit={createBuildingRecord}>

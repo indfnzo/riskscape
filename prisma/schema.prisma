@@ -13,16 +13,38 @@ datasource db {
 model Building {
   id Int @id @default(autoincrement())
 
-  name String
-  address String
-  zipCode String
-  contactName String
+  name         String
+  address      String
+  zipCode      String
+  contactName  String
   contactPhone String
 
   lat Float
   lng Float
 
-  seismicZone String
+  seismicZone           String
   distanceFromFaultLine Float
-  soilType String
+  soilType              String
+
+  assessmentLogs AssessmentLog[]
+}
+
+model AssessmentLog {
+  id Int @id @default(autoincrement())
+
+  building   Building @relation(fields: [buildingId], references: [id])
+  buildingId Int
+
+  type                 String
+  inspectionDate       DateTime
+  inspectorName        String
+  inspectorAffiliation String
+  inspectorDesignation String
+
+  inspectionScope String
+  inspectionData  String
+
+  contactName  String
+  contactPhone String
+  contactEmail String
 }

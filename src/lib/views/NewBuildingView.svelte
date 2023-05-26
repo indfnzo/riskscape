@@ -6,7 +6,7 @@
 	import { LngLat, Marker } from 'mapbox-gl';
 	import type { Building } from '@prisma/client';
     import { fetchBuildings, selectedBuilding } from '$lib/stores';
-	import { getStandardPadding, sleep } from '$lib/helpers';
+	import { SEISMIC_ZONES, getStandardPadding, sleep } from '$lib/helpers';
 
     const mapContext = getContext<MapContext>('map');
     const { map } = mapContext;
@@ -170,18 +170,12 @@
                     <aside><h3>Seismic Zone & Soil Type</h3></aside>
                     <main>
                         <SelectList label="Seismic Zone" bind:value={building.seismicZone}>
-                            <SelectListItem value="2" title="Zone 2">
-                                <svg slot="image" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M37.7846 55.2983C48.2451 52.7097 56 43.2605 56 32C56 18.7452 45.2548 8 32 8C18.7452 8 8 18.7452 8 32C8 43.1205 15.5634 52.4746 25.8267 55.1986L32 41L21 32L35 13.5L29 28L43 39L37.7846 55.2983Z" fill="#D4A52B"/>
-                                </svg>
-                                Low to moderate probability of damaging ground motion.
-                            </SelectListItem>
-                            <SelectListItem value="4" title="Zone 4">
-                                <svg slot="image" width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M37.7846 55.2983C48.2451 52.7097 56 43.2605 56 32C56 18.7452 45.2548 8 32 8C18.7452 8 8 18.7452 8 32C8 43.1205 15.5634 52.4746 25.8267 55.1986L32 41L21 32L35 13.5L29 28L43 39L37.7846 55.2983Z" fill="#C53333"/>
-                                </svg>
-                                High probability of damaging ground motion.
-                            </SelectListItem>
+                            {#each Object.entries(SEISMIC_ZONES) as [id, zone]}
+                                <SelectListItem value={id} title={zone.name}>
+                                    <div slot="image">{@html zone.icon}</div>
+                                    {zone.description}
+                                </SelectListItem>
+                            {/each}
                         </SelectList>
                         <hr />
                         <div class="control-group">

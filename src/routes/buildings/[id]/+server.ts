@@ -5,7 +5,10 @@ export async function GET({ params }) {
     const id = parseInt(params.id);
     if (isNaN(id)) throw error(404);
 
-    const building = await prisma.building.findUnique({ where: { id } });
+    const building = await prisma.building.findUnique({
+        where: { id },
+        include: { assessmentLogs: true }
+    });
     if (!building) throw error(404);
 
     return new Response(JSON.stringify(building), {

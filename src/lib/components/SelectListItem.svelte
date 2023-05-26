@@ -18,7 +18,7 @@
 		<slot name="image"></slot>
 	</div>
 	<div class="content">
-		<div class="title">{title}</div>
+		<div class="title"><slot name="title">{title}</slot></div>
 		<div class="description"><slot></slot></div>
 	</div>
 </button>

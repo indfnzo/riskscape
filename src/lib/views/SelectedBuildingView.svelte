@@ -3,8 +3,9 @@
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { selectedBuilding, selectBuilding } from '$lib/stores';
-	import { Panel, type MapContext } from '$lib/components';
-	import { getSidebarAwareMapPadding } from '$lib/helpers';
+	import type { MapContext } from '$lib/components';
+	import { AssessmentTabView } from '$lib/views';
+	import { SEISMIC_ZONES, SOIL_TYPES, getSidebarAwareMapPadding } from '$lib/helpers';
 
     const mapContext = getContext<MapContext>('map');
     const { map } = mapContext;
@@ -32,15 +33,91 @@
 {#if building}
     <div
         class="selected-building-view"
-        in:fly={{ x: 20, duration: 500, delay: 250, easing: quintOut }}
-        out:fly={{ x: 20, duration: 500, easing: quintOut }}
+        in:fly={{ y: 20, duration: 500, delay: 250, easing: quintOut }}
+        out:fly={{ y: 20, duration: 500, easing: quintOut }}
     >
-        <Panel>
-            <button on:click={closeBuilding}>
-                Back
-            </button>
-            <h2>{building.name}</h2>
-        </Panel>
+        <div class="building-panel" class:loading>
+            <div class="media-section">
+                <button class="back-button" on:click={closeBuilding}>
+                    {#if loading}
+                        <svg class="icon spin" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 12C21 10.0188 20.3463 8.09295 19.1402 6.52115C17.9341 4.94935 16.2431 3.81945 14.3294 3.30667C12.4157 2.7939 10.3863 2.92691 8.55589 3.68509C6.72549 4.44326 5.19641 5.78423 4.20581 7.5" stroke="currentColor"/>
+                            <path d="M2.99996 12C2.99996 13.9812 3.6537 15.9071 4.85978 17.4788C6.06586 19.0506 7.75689 20.1806 9.67059 20.6933C11.5843 21.2061 13.6137 21.0731 15.4441 20.3149C17.2745 19.5567 18.8036 18.2158 19.7942 16.5" stroke="currentColor"/>
+                            <path d="M9.20581 7.5L4.20581 7.5L4.20581 2.5" stroke="currentColor"/>
+                            <path d="M14.7942 16.5L19.7942 16.5L19.7942 21.5" stroke="currentColor"/>
+                        </svg>
+                    {:else}
+                        <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M20 12L4 12M4 12L12 20M4 12L12 4" stroke="currentColor" stroke-linecap="square" />
+                        </svg>
+                    {/if}
+                </button>
+                <h2 class="title">{building.name}</h2>
+            </div>
+            <div class="details-section">
+                <div class="detail-row">
+                    <div class="detail-block">
+                        <div class="label">Address</div>
+                        <div class="value">{building.address}</div>
+                    </div>
+                    <div class="detail-block">
+                        <div class="label">Zip</div>
+                        <div class="value">{building.zipCode || '-'}</div>
+                    </div>
+                </div>
+                <div class="detail-block">
+                    <div class="label">Contact Person</div>
+                    <div class="value">
+                        {building.contactName || '-'}
+                        {#if building.contactPhone}
+                            ({building.contactPhone})
+                        {/if}
+                    </div>
+                </div>
+                <hr />
+                <div class="detail-block">
+                    <div class="label">Seismic Zone</div>
+                    <div class="value">
+                        {#if SEISMIC_ZONES[building.seismicZone]}
+                            <div class="zone-block">
+                                <div class="zone-icon">{@html SEISMIC_ZONES[building.seismicZone].icon}</div>
+                                <div class="zone-info">
+                                    <span class="zone-name" style="color: {SEISMIC_ZONES[building.seismicZone].color};">{SEISMIC_ZONES[building.seismicZone].name}</span>
+                                    <span class="zone-description">{SEISMIC_ZONES[building.seismicZone].description}</span>
+                                </div>
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-block">
+                        <div class="label">Soil Type</div>
+                        <div class="value">{SOIL_TYPES[building.soilType] || '-'}</div>
+                    </div>
+                    <div class="detail-block">
+                        <div class="label">Distance</div>
+                        <div class="value">
+                            {#if building.distanceFromFaultLine}
+                                {#if building.distanceFromFaultLine <= 5.0}
+                                    <strong style="color: var(--theme-seismic-zone-4);" title="Near Source">{building.distanceFromFaultLine}km</strong>
+                                {:else}
+                                    <span>{building.distanceFromFaultLine}km</span>
+                                {/if}
+                            {:else}
+                                -
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div
+            in:fly={{ y: 20, duration: 500, delay: 500, easing: quintOut }}
+            out:fly={{ y: 20, duration: 500, easing: quintOut }}
+        >
+            <AssessmentTabView />
+        </div>
     </div>
 {/if}
 
@@ -50,14 +127,158 @@
         left: 2rem;
         right: 2rem;
         top: 8rem;
+        max-height: calc(100vh - 8rem);
         display: grid;
         gap: 1rem;
+        backdrop-filter: blur(0.5rem);
+        border-radius: 0.5rem;
+        overflow: auto;
     }
+
+    .selected-building-view::-webkit-scrollbar {
+        height: 0.25rem;
+        width: 0.25rem;
+	}
+
+	.selected-building-view::-webkit-scrollbar-track,
+	.selected-building-view::-webkit-scrollbar-corner {
+        background-color: transparent;
+	}
+
+	.selected-building-view::-webkit-scrollbar-thumb {
+        outline: none;
+        background-color: rgb(255 255 255 / 25%);
+		overflow: hidden;
+	}
+
+	.selected-building-view::-webkit-scrollbar-thumb:hover {
+        background-color: rgb(255 255 255 / 50%);
+	}
 
     @media (min-width: 640px) {
         .selected-building-view {
             right: auto;
             width: 32rem;
         }
+    }
+
+    .building-panel {
+        background: rgb(0 0 0 / 25%);
+        border-radius: 0.5rem;
+        overflow: hidden;
+    }
+
+    .media-section {
+        position: relative;
+        padding: 6rem 2rem 1rem;
+        color: white;
+        z-index: 1;
+    }
+
+    .media-section::after {
+        content: "";
+        display: block;
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        height: 100%;
+        background: linear-gradient(to bottom, rgb(26 26 26 / 0%), rgb(26 26 26 / 50%));
+        z-index: -1;
+    }
+
+    .back-button {
+        position: absolute;
+        left: 1rem;
+        top: 1rem;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3.5rem;
+        height: 3.5rem;
+
+        appearance: none;
+        background: none;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 100ms ease;
+    }
+
+    .back-button:hover,
+    .back-button:focus {
+        background: rgb(0 0 0 / 25%);
+    }
+
+    .back-button .icon {
+        width: 2rem;
+        height: 2rem;
+    }
+
+    .back-button .spin {
+        animation: building-back-button-loading-spin 500ms infinite linear;
+    }
+
+    @keyframes building-back-button-loading-spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(-360deg); }
+    }
+
+    .media-section .title {
+        display: block;
+        margin: 0;
+        font-size: 1.75rem;
+        font-weight: 700;
+        line-height: 1.25;
+    }
+
+    .details-section {
+        padding: 1.5rem 2rem;
+        display: grid;
+        gap: 1.5rem;
+        background: white;
+    }
+
+    .details-section .detail-row {
+        display: grid;
+        grid-template-columns: 1fr 6rem;
+        gap: 2rem;
+    }
+
+    .details-section .detail-block .label {
+        display: block;
+        margin: 0 0 0.5rem;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: rgb(0 0 0 / 50%);
+        text-transform: uppercase;
+    }
+
+    .details-section .detail-block .value {
+        font-size: 1.125rem;
+        font-weight: 500;
+    }
+
+    .details-section .zone-block {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .details-section .zone-info {
+        margin: 0.25rem 0;
+    }
+
+    .details-section .zone-name {
+        display: block;
+        margin: 0 0 0.25rem;
+        font-weight: 600;
+    }
+
+    .details-section .zone-description {
+        display: block;
+        font-size: 0.9rem;
+        color: rgb(0 0 0 / 50%);
     }
 </style>

@@ -12,3 +12,8 @@ export { default as NumberInput } from './NumberInput.svelte';
 export { default as Select } from './Select.svelte';
 export { default as SelectList } from './SelectList.svelte';
 export { default as SelectListItem } from './SelectListItem.svelte';
+
+export { default as VulnerabilityAssessmentLogPanel } from './VulnerabilityAssessmentLogPanel.svelte';
+export { default as AddVulnerabilityAssessmentLogModal } from './AddVulnerabilityAssessmentLogModal.svelte';
+export { default as DamageAssessmentLogPanel } from './DamageAssessmentLogPanel.svelte';
+export { default as AddDamageAssessmentLogModal } from './AddDamageAssessmentLogModal.svelte';

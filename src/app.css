@@ -19,8 +19,16 @@ html, body {
 	html, body { font-size: 12px; }
 }
 
-@media (min-width: 480px) {
+@media (min-width: 400px) {
 	html, body { font-size: 13px; }
+}
+
+@media (min-width: 480px) {
+	html, body { font-size: 14px; }
+}
+
+@media (min-width: 560px) {
+	html, body { font-size: 15px; }
 }
 
 @media (min-width: 640px) {

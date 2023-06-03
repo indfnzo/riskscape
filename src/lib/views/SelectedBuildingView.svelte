@@ -127,7 +127,7 @@
         left: 2rem;
         right: 2rem;
         top: 8rem;
-        max-height: calc(100vh - 8rem);
+        max-height: calc(100% - 8rem);
         display: grid;
         gap: 1rem;
         backdrop-filter: blur(0.5rem);

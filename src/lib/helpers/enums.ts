@@ -30,43 +30,47 @@ export const SOIL_TYPES: Record<string, string> = {
 	'SF': 'SF (Soil requiring site-specific evaluation)',
 };
 
-export const BUILDING_MATERIALS = {
-	'wood': 'Wood',
-	'masonry': 'Masonry',
-	'concrete': 'Concrete',
-	'steel': 'Steel',
+export const BUILDING_MATERIALS: Record<string, { name: string, structuralTypes: Record<string, string>}> = {
+	'wood': {
+		name: 'Wood',
+		structuralTypes: {
+			'W1': 'Wood, light frame',
+			'W3': 'Bamboo',
+			'N': 'Makeshift',
+		}
+	},
+	'masonry': {
+		name: 'Masonry',
+		structuralTypes: {
+			'MWS': 'Concrete hollow blocks with wood or light metal',
+			'CHB': 'Concrete hollow blocks',
+			'URA': 'Adobe',
+			'URM': 'Unreinforced masonry bearing walls',
+		}
+	},
+	'concrete': {
+		name: 'Concrete',
+		structuralTypes: {
+			'CWS': 'Reinforced concrete moment frames with wood or light metal',
+			'C1': 'Reinforced concrete moment frames',
+			'C4': 'Concrete shear walls and frames',
+			'PC2': 'Precast Frame',
+		}
+	},
+	'steel': {
+		name: 'Steel',
+		structuralTypes: {
+			'S1': 'Steel moment frame',
+			'S3': 'Light metal frame',
+			'S4': 'Steel frame with cast-in-place concrete shear walls',
+		}
+	},
 };
-export type BuildingMaterial = keyof typeof BUILDING_MATERIALS;
-
-export const BUILDING_STRUCTURAL_TYPES = {
-	// wood
-	'W1': 'Wood, light frame',
-	'W3': 'Bamboo',
-	'N': 'Makeshift',
-
-	// masonry
-	'MWS': 'Concrete hollow blocks with wood or light metal',
-	'CHB': 'Concrete hollow blocks',
-	'URA': 'Adobe',
-	'URM': 'Unreinforced masonry bearing walls',
-
-	// concrete
-	'CWS': 'Reinforced concrete moment frames with wood or light metal',
-	'C1': 'Reinforced concrete moment frames',
-	'C4': 'Concrete shear walls and frames',
-	'PC2': 'Precast Frame',
-
-	// steel
-	'S1': 'Steel moment frame',
-	'S3': 'Light metal frame',
-	'S4': 'Steel frame with cast-in-place concrete shear walls',
-};
-export type BuildingStructuralType = keyof typeof BUILDING_STRUCTURAL_TYPES;
 
 export const BUILDING_DESIGN_CHANGE_TYPES = {
 	'renovation': 'Renovation',
 	'repair': 'Repair',
-	'addition': 'Additional construction/Building additions',
+	'addition': 'Add\'l construction/Building additions',
 };
 export type BuildingDesignChangeType = keyof typeof BUILDING_DESIGN_CHANGE_TYPES;
 
@@ -149,11 +153,11 @@ export const BUILDING_CONDITION_FLAGS = {
 			description: 'When the floor levels have a vertical offset and are staggered.',
 			image: 'vertical_irregularities/VI-6-SL.png',
 		},
-		'weak_story': {
-			name: 'Weak Story',
-			description: 'The story strength is <80% of that in the story above. The story strength is the total strength of all seismic-resisting elemets sharing the story for the direction under consideration.',
-			image: 'vertical_irregularities/VI-0-Soft.png',
-		}
+		// 'weak_story': {
+		// 	name: 'Weak Story',
+		// 	description: 'The story strength is <80% of that in the story above. The story strength is the total strength of all seismic-resisting elemets sharing the story for the direction under consideration.',
+		// 	image: 'vertical_irregularities/VI-0-Soft.png',
+		// }
 	},
 
 	PLAN_IRREGULARITIES: {
@@ -480,7 +484,7 @@ export type BuildingDamageMaterialIndicatorAreas = {
 };
 export type BuildingDamageIndicatorArea = BuildingDamageMaterialIndicatorAreas[keyof BuildingDamageMaterialIndicatorAreas];
 
-export const BUILDING_DAMAGE_LEVELS: Record<BuildingMaterial, Partial<Record<'default' | BuildingStructuralType, BuildingDamageLevelIndicators>>> = {
+export const BUILDING_DAMAGE_LEVELS: Record<string, Partial<Record<'default' | string, BuildingDamageLevelIndicators>>> = {
 	'wood': {
 		'default': {
 			'Negligible-Slight': 'Small plaster or gypsum-board cracks at corners of door and window openings and wall-ceiling intersections; small cracks in masonry chimneys and masonry veneer.',
@@ -493,7 +497,7 @@ export const BUILDING_DAMAGE_LEVELS: Record<BuildingMaterial, Partial<Record<'de
 		'default': {
 			'Negligible-Slight': 'Hair-line cracks in very few walls. Fall of small pieces of plaster only. Fall of loose stones from upper parts of buildings in very few cases.',
 			'Moderate': 'Cracks in many walls. Fall of fairly large pieces of plaster. Partial collapse of chimneys.',
-			'Extensive': 'Large and extensive cracks in most walls. Roof tiles detach. Chimneys fracture at the roof line; failure of individual non-structural elements (partitions, gable walls)',
+			'Extensive': 'Large and extensive cracks in most walls. Roof tiles detach. Chimneys fracture at the roof line; failure of individual non-structural elements (partitions, gable walls)',
 			'Complete': 'Serious failure of walls; partial structural failure of roofs and floors, total or near total collapse.',
 		},
 		'URM': {

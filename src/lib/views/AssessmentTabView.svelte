@@ -20,7 +20,7 @@
         <button class="tab" class:active={activeTab === 'post'} on:click={() => activeTab = 'post'}>Damage</button>
     </div>
 
-    {#if loading}
+    {#if loading || !building}
         <div class="tab-content">
             Loading...
         </div>
@@ -28,8 +28,8 @@
         <div class="tab-content">
             {#if vulnerabilityAssessmentLogs && vulnerabilityAssessmentLogs.length > 0}
                 <div class="log-panels">
-                    {#each vulnerabilityAssessmentLogs as log}
-                        <VulnerabilityAssessmentLogPanel {log} />
+                    {#each vulnerabilityAssessmentLogs as log (log.id)}
+                        <VulnerabilityAssessmentLogPanel {building} {log} />
                     {/each}
                 </div>
             {:else}
@@ -38,7 +38,9 @@
                 </div>
             {/if}
 
-            <AddVulnerabilityAssessmentLogModal />
+            <AddVulnerabilityAssessmentLogModal {building} let:modal>
+                <button class="add-assessment-button" on:click={modal.open}>Add Assessment</button>
+            </AddVulnerabilityAssessmentLogModal>
         </div>
     {:else}
         <div class="tab-content">
@@ -54,7 +56,7 @@
                 </div>
             {/if}
 
-            <AddDamageAssessmentLogModal />
+            <AddDamageAssessmentLogModal {building} />
         </div>
     {/if}
 </div>
@@ -111,5 +113,28 @@
 
     .logs-empty {
         opacity: 0.5;
+    }
+
+    .log-panels {
+        margin: -1rem -2rem 0;
+    }
+
+    .add-assessment-button {
+        display: block;
+        margin: 2rem 0 0;
+        padding: 1rem 1.5rem;
+        background: rgb(255 255 255 / 5%);
+        color: white;
+        font-size: 1rem;
+        font-weight: 600;
+        border: none;
+        border-radius: 0.25rem;
+        cursor: pointer;
+        transition: all 100ms ease;
+    }
+
+    .add-assessment-button:hover,
+    .add-assessment-button:focus {
+        background: rgb(255 255 255 / 10%);
     }
 </style>

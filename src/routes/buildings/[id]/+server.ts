@@ -7,7 +7,11 @@ export async function GET({ params }) {
 
     const building = await prisma.building.findUnique({
         where: { id },
-        include: { assessmentLogs: true }
+        include: {
+            assessmentLogs: {
+                orderBy: [{ inspectionDate: 'desc' }]
+            }
+        },
     });
     if (!building) throw error(404);
 

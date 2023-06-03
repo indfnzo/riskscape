@@ -163,7 +163,7 @@
                             </Button>
                         </div>
                         <!-- svelte-ignore a11y-invalid-attribute -->
-                        <a class="manual-location-link" href="javascript:void(0)" on:click={promptLocation}>Set location manually</a>
+                        <a class="link" style="margin-top: -0.5rem;" href="javascript:void(0)" on:click={promptLocation}>Set location manually</a>
                     </main>
                 </section>
                 <section>
@@ -180,15 +180,18 @@
                         <hr />
                         <div class="control-group">
                             <NumberInput label="Distance from Fault Line (km)" placeholder="0.00" step="0.001" bind:value={building.distanceFromFaultLine} />
-                            <Select label="Soil Type" bind:value={building.soilType}>
-                                <option value="" disabled>Soil Type</option>
-                                <option value="SA">SA (Hard rock)</option>
-                                <option value="SB">SB (Rock)</option>
-                                <option value="SC">SC (Very dense soil and soft rock)</option>
-                                <option value="SD">SD (Stiff soil profile)</option>
-                                <option value="SE">SE (Soft soil profile)</option>
-                                <option value="SF">SF (Soil requiring site-specific evaluation)</option>
-                            </Select>
+                            <div style="width: 100%;">
+                                <Select label="Soil Type" bind:value={building.soilType}>
+                                    <option value="" disabled>Soil Type</option>
+                                    <option value="SA">SA (Hard rock)</option>
+                                    <option value="SB">SB (Rock)</option>
+                                    <option value="SC">SC (Very dense soil and soft rock)</option>
+                                    <option value="SD">SD (Stiff soil profile)</option>
+                                    <option value="SE">SE (Soft soil profile)</option>
+                                    <option value="SF">SF (Soil requiring site-specific evaluation)</option>
+                                </Select>
+                                <p class="field-note">If soil type is unknown, select SD.</p>
+                            </div>
                         </div>
                     </main>
                 </section>
@@ -242,15 +245,6 @@
         border-radius: 50%;
         box-shadow: 0 3px 5px rgb(0 0 0 / 50%);
         cursor: default;
-    }
-
-    .manual-location-link {
-        display: inline-block;
-        margin: -0.5rem 0 0;
-        color: var(--theme-accent);
-        text-decoration: none;
-        font-size: 0.9rem;
-        font-weight: 700;
     }
 
     .error {

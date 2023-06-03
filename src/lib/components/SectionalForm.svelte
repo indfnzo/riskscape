@@ -24,6 +24,17 @@
         display: block;
     }
 
+    @media (max-width: 639px) {
+        .sectional-form :global(section.cta-row aside) {
+            display: grid;
+            order: 2;
+        }
+
+        .sectional-form :global(section.cta-row main) {
+            order: 1;
+        }
+    }
+
     .sectional-form :global(section:not(:first-child) aside) {
         border-top: 1px solid rgb(0 0 0 / 10%);
     }
@@ -77,15 +88,21 @@
 
     /* text styles */
 
-    .sectional-form :global(aside h3) {
+    .sectional-form :global(h2) {
+        margin: 0;
+        font-size: 1.25rem;
+    }
+
+    .sectional-form :global(h3) {
         margin: 0;
         font-size: 0.9rem;
         font-weight: 900;
     }
 
-    .sectional-form :global(main h2) {
+    .sectional-form :global(h4) {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 0.9rem;
+        font-weight: 900;
     }
 
     /* horizontal form groups */
@@ -100,5 +117,31 @@
             display: flex;
             gap: 1rem;
         }
+    }
+
+    .sectional-form :global(.field-note) {
+        margin: 0.5rem 0;
+        color: rgb(0 0 0 / 50%);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .sectional-form :global(.form-hint) {
+        margin: 0.5rem 0;
+        color: rgb(0 0 0 / 50%);
+        font-size: 0.9rem;
+    }
+
+    /* override disabled forms */
+
+    .sectional-form :global(.form-control :disabled) {
+        background: none;
+        outline: 1px solid rgb(0 0 0 / 5%);
+        font-weight: 500;
+    }
+
+    .sectional-form :global(.form-control:has(:disabled) label) {
+        color: var(--theme-accent);
+        opacity: 0.75;
     }
 </style>

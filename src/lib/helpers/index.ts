@@ -6,3 +6,4 @@ export * from './debounce';
 
 export * from './mapPaddings';
 export * from './enums';
+export * from './computedValues';

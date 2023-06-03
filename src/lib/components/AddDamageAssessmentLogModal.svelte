@@ -1,4 +1,26 @@
-<button class="add-assessment-button">Add Assessment</button>
+<script lang="ts">
+	import type { Building } from '@prisma/client';
+	import { Modal, ModalContext, SectionalForm } from '.';
+
+    export let building: Building;
+
+    const addVulnerabilityAssessmentLog = () => {};
+</script>
+<ModalContext let:modal>
+    <button class="add-assessment-button" on:click={modal.open}>Add Assessment</button>
+    <Modal>
+        <SectionalForm onSubmit={addVulnerabilityAssessmentLog}>
+            <section>
+                <aside></aside>
+                <main>
+                    <h2>
+                        {building.name}
+                    </h2>
+                </main>
+            </section>
+        </SectionalForm>
+    </Modal>
+</ModalContext>
 
 <style>
     .add-assessment-button {

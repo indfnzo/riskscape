@@ -80,7 +80,7 @@
                     <div class="value">
                         {#if SEISMIC_ZONES[building.seismicZone]}
                             <div class="zone-block">
-                                <div class="zone-icon">{@html SEISMIC_ZONES[building.seismicZone].icon}</div>
+                                {@html SEISMIC_ZONES[building.seismicZone].icon}
                                 <div class="zone-info">
                                     <span class="zone-name" style="color: {SEISMIC_ZONES[building.seismicZone].color};">{SEISMIC_ZONES[building.seismicZone].name}</span>
                                     <span class="zone-description">{SEISMIC_ZONES[building.seismicZone].description}</span>
@@ -264,6 +264,7 @@
     .details-section .zone-block {
         display: flex;
         gap: 1rem;
+        align-items: center;
     }
 
     .details-section .zone-info {

@@ -28,6 +28,7 @@
 		top: 0.5rem;
 		font-size: 0.8rem;
 		font-weight: 700;
+		background: white;
 		z-index: 1;
 		pointer-events: none;
 	}
@@ -38,10 +39,16 @@
 		line-height: 2.25rem;
 	}
 
+	.form-control.has-label :global(textarea) {
+		padding-top: 1.75rem;
+		padding-bottom: 1rem;
+	}
+
 	/* field styles */
 
 	.form-control :global(input),
-	.form-control :global(select) {
+	.form-control :global(select),
+	.form-control :global(textarea) {
 		display: block;
 		appearance: none;
 		width: calc(100% - 1.5rem);
@@ -50,9 +57,16 @@
 		line-height: 3.5rem;
 		background: none;
 		border: none;
+		color: black;
+		opacity: 1;
 		outline: 1px solid rgb(0 0 0 / 25%);
 		border-radius: 0.25rem;
 		transition: all 100ms ease;
+	}
+	
+	.form-control :global(textarea) {
+		line-height: 1.5rem;
+		resize: vertical;
 	}
 
 	/* handle weird select padding difference & other css */
@@ -67,7 +81,8 @@
 	/* focus styles */
 
 	.form-control :global(input:focus),
-	.form-control :global(select:focus) {
+	.form-control :global(select:focus),
+	.form-control :global(textarea:focus) {
 		border-color: var(--theme-focus);
 		outline: 2px solid var(--theme-focus);
 	}
@@ -75,12 +90,14 @@
 	/* disabled styles */
 
 	.form-control :global(input:disabled),
-	.form-control :global(select:disabled) {
+	.form-control :global(select:disabled),
+	.form-control :global(textarea:disabled) {
 		background: rgb(0 0 0 / 2.5%);
 	}
 
 	.form-control:has(input:disabled) :global(label),
-	.form-control:has(select:disabled) :global(label) {
+	.form-control:has(select:disabled) :global(label),
+	.form-control:has(textarea:disabled) :global(label) {
 		opacity: 0.5;
 	}
 </style>

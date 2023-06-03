@@ -47,4 +47,6 @@ model AssessmentLog {
   contactName  String
   contactPhone String
   contactEmail String
+
+  formCompletionDuration Int
 }

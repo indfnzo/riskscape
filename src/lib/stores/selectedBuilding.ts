@@ -153,10 +153,11 @@ export type VulnerabilityAssessmentLog = AssessmentLogData & { inspectionData: V
 
 export type DamageAssessmentLogData = {
     buildingMaterial: string;
+    buildingStructuralType: string;
     damageIndicators: Partial<Record<BuildingDamageIndicatorArea, string>>;
-    damageLevel: BuildingDamageLevel;
-    safetyEvaluation: Record<BuildingSafetyEvaluationCondition, BuildingSafetyEvaluationSeverity>;
-    finalPosting: BuildingFinalPosting;
+    damageLevel: BuildingDamageLevel | '';
+    safetyEvaluation: Record<BuildingSafetyEvaluationCondition | string, BuildingSafetyEvaluationSeverity | ''>;
+    finalPosting: BuildingFinalPosting | '';
     recommendations: {
         barricadesRecommended: boolean;
         barricadesRemarks: string;
@@ -168,6 +169,31 @@ export type DamageAssessmentLogData = {
         }
     };
     generalRemarks: string;
+};
+
+export const defaultDamageAssessmentLogData: DamageAssessmentLogData = {
+    buildingMaterial: '',
+    buildingStructuralType: '',
+    damageIndicators: {},
+    damageLevel: '',
+    safetyEvaluation: {
+        collapsed: '',
+        leaning: '',
+        racking_damage: '',
+        falling_hazard: '',
+        slope_movement_cracking: '',
+    },
+    finalPosting: '',
+    recommendations: {
+        barricadesRecommended: false,
+        barricadesRemarks: '',
+        detailedEvaluationsRecommended: {
+            structural: false,
+            geotechnical: false,
+            other: '',
+        },
+    },
+    generalRemarks: '',
 };
 
 export type DamageAssessmentLog = AssessmentLogData & { inspectionData: DamageAssessmentLogData };

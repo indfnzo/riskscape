@@ -1,8 +1,5 @@
 <script lang="ts">
-	import {
-        AddDamageAssessmentLogModal, AddVulnerabilityAssessmentLogModal,
-        DamageAssessmentLogPanel, VulnerabilityAssessmentLogPanel
-    } from '$lib/components';
+	import { AddDamageAssessmentLogModal, AddVulnerabilityAssessmentLogModal } from '$lib/components';
 	import { selectedBuilding } from '$lib/stores';
 
     $: loading = $selectedBuilding?.loading;
@@ -29,7 +26,20 @@
             {#if vulnerabilityAssessmentLogs && vulnerabilityAssessmentLogs.length > 0}
                 <div class="log-panels">
                     {#each vulnerabilityAssessmentLogs as log (log.id)}
-                        <VulnerabilityAssessmentLogPanel {building} {log} />
+                        <AddVulnerabilityAssessmentLogModal {building} preview={log} let:modal>
+                            <button class="panel-button" on:click={modal.open}>
+                                <div class="content">
+                                    <div class="title">
+                                        <span class="condition">{log.inspectionData.overallPresentCondition}</span>
+                                        <span class="date">{log.inspectionDate.toDateString()}</span>
+                                    </div>
+                                    <div class="inspector">{log.inspectorName} ({log.inspectorAffiliation})</div>
+                                </div>
+                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 12H20M20 12L12 4M20 12L12 20" stroke="currentColor" stroke-linecap="square"/>
+                                </svg>
+                            </button>
+                        </AddVulnerabilityAssessmentLogModal>
                     {/each}
                 </div>
             {:else}
@@ -46,8 +56,21 @@
         <div class="tab-content">
             {#if damageAssessmentLogs && damageAssessmentLogs.length > 0}
                 <div class="log-panels">
-                    {#each damageAssessmentLogs as log}
-                        <DamageAssessmentLogPanel {log} />
+                    {#each damageAssessmentLogs as log (log.id)}
+                        <AddDamageAssessmentLogModal {building} preview={log} let:modal>
+                            <button class="panel-button" on:click={modal.open}>
+                                <div class="content">
+                                    <div class="title">
+                                        <span class="condition">{log.inspectionData.finalPosting}</span>
+                                        <span class="date">{log.inspectionDate.toDateString()}</span>
+                                    </div>
+                                    <div class="inspector">{log.inspectorName} ({log.inspectorAffiliation})</div>
+                                </div>
+                                <svg class="icon" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M4 12H20M20 12L12 4M20 12L12 20" stroke="currentColor" stroke-linecap="square"/>
+                                </svg>
+                            </button>
+                        </AddDamageAssessmentLogModal>
                     {/each}
                 </div>
             {:else}
@@ -56,7 +79,9 @@
                 </div>
             {/if}
 
-            <AddDamageAssessmentLogModal {building} />
+            <AddDamageAssessmentLogModal {building} let:modal>
+                <button class="add-assessment-button" on:click={modal.open}>Add Assessment</button>
+            </AddDamageAssessmentLogModal>
         </div>
     {/if}
 </div>
@@ -138,4 +163,64 @@
     .add-assessment-button:focus {
         background: rgb(255 255 255 / 10%);
     }
+
+    .panel-button {
+		position: relative;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 1rem 2rem;
+		width: 100%;
+		text-align: left;
+		background: none;
+		color: white;
+		border: none;
+		cursor: pointer;
+	}
+
+	.panel-button:hover,
+	.panel-button:focus {
+		background: rgb(255 255 255 / 5%);
+	}
+
+	.panel-button + :global(.panel-button::before) {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 2rem;
+		right: 2rem;
+		height: 1px;
+		background: rgb(255 255 255 / 5%);
+	}
+
+	.panel-button .icon {
+		width: 2rem;
+		height: 2rem;
+		color: rgb(255 255 255 / 50%);
+	}
+
+	.panel-button .title {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 1rem;
+		margin: 0 0 0.5rem;
+	}
+
+	.panel-button .condition {
+		font-size: 1.2rem;
+		font-weight: 700;
+	}
+
+	.panel-button .date {
+		font-size: 1rem;
+		font-weight: 700;
+		color: rgb(255 255 255 / 50%);
+	}
+
+	.panel-button .inspector {
+		font-size: 1rem;
+		font-weight: 500;
+		color: rgb(255 255 255 / 50%);
+	}
 </style>

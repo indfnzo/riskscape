@@ -254,7 +254,7 @@ export interface BuildingConditions {
 };
 
 
-export const BUILDING_DAMAGE_INDICATORS = {
+export const BUILDING_DAMAGE_INDICATORS: Record<string, Record<string, { area: string, indicators: string[] }>> = {
 	'wood': {
 		'entire_outside': {
 			area: 'Entire outside',
@@ -552,13 +552,46 @@ export type BuildingDamageLevel = 'Negligible-Slight' | 'Moderate' | 'Extensive'
 export type BuildingDamageLevelIndicators = Record<BuildingDamageLevel, string>;
 
 export const BUILDING_SAFETY_EVALUATION_CONDITIONS = {
-	'collapsed': 'Collapse, partial collapse, or building off foundation',
-	'leaning': 'Building or story leaning',
-	'racking_damage': 'Racking damage to walls, other structural damage',
-	'falling_hazard': 'Chimney, parapet, or other falling hazard',
-	'slope_movement_cracking': 'Ground slope movement or cracking',
+	'collapsed': {
+		name: 'Collapse, partial collapse, or building off foundation',
+		getRemarks: (severity: string) => {
+			if (severity === 'Slight' || severity === 'Moderate' || severity === 'Severe') return 'Unsafe';
+			return '';
+		},
+	},
+	'leaning': {
+		name: 'Building or story leaning',
+		getRemarks: (severity: string) => {
+			if (severity === 'Severe') return 'Unsafe';
+			else if (severity === 'Slight' || severity == 'Moderate') return 'Intermediate';
+			return '';
+		},
+	},
+	'racking_damage': {
+		name: 'Racking damage to walls, other structural damage',
+		getRemarks: (severity: string) => {
+			if (severity === 'Severe') return 'Unsafe';
+			else if (severity === 'Slight' || severity == 'Moderate') return 'Intermediate';
+			return '';
+		},
+	},
+	'falling_hazard': {
+		name: 'Chimney, parapet, or other falling hazard',
+		getRemarks: (severity: string) => {
+			if (severity === 'Slight' || severity === 'Moderate' || severity === 'Severe') return 'Area Unsafe';
+			return '';
+		},
+	},
+	'slope_movement_cracking': {
+		name: 'Ground slope movement or cracking',
+		getRemarks: (severity: string) => {
+			if (severity === 'Severe') return 'Unsafe';
+			else if (severity === 'Slight' || severity == 'Moderate') return 'Intermediate';
+			return '';
+		},
+	},
 };
 export type BuildingSafetyEvaluationCondition = keyof typeof BUILDING_SAFETY_EVALUATION_CONDITIONS;
-export type BuildingSafetyEvaluationSeverity = 'Slight' | 'Moderate' | 'Severe';
+export type BuildingSafetyEvaluationSeverity = 'None' | 'Slight' | 'Moderate' | 'Severe';
 
 export type BuildingFinalPosting = 'INSPECTED' | 'RESTRICTED USE' | 'UNSAFE';

@@ -131,6 +131,7 @@
         display: grid;
         gap: 1rem;
         backdrop-filter: blur(0.5rem);
+        -webkit-backdrop-filter: blur(0.5rem);
         border-radius: 0.5rem;
         overflow: auto;
     }

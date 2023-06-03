@@ -87,7 +87,8 @@
         position: relative;
         background: rgb(0 0 0 / 50%);
         border-radius: 5rem;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(0.5rem);
+        -webkit-backdrop-filter: blur(0.5rem);
     }
 
     input {
@@ -146,7 +147,8 @@
         padding: 1rem;
         background: rgb(0 0 0 / 50%);
         border-radius: 1rem;
-        backdrop-filter: blur(5px);
+        backdrop-filter: blur(0.5rem);
+        -webkit-backdrop-filter: blur(0.5rem);
     }
 
     .search-results-container .label {

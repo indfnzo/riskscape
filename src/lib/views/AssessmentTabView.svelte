@@ -69,6 +69,7 @@
         border-radius: 0.5rem;
         overflow: hidden;
         backdrop-filter: blur(0.5rem);
+        -webkit-backdrop-filter: blur(0.5rem);
     }
 
     .tabs {

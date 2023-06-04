@@ -5,7 +5,7 @@
 	import { selectedBuilding, selectBuilding } from '$lib/stores';
 	import type { MapContext } from '$lib/components';
 	import { AssessmentTabView } from '$lib/views';
-	import { SEISMIC_ZONES, SOIL_TYPES, getSidebarAwareMapPadding } from '$lib/helpers';
+	import { SEISMIC_ZONES, SOIL_TYPES, getSidebarAwareMapPadding, getStandardPadding } from '$lib/helpers';
 
     const mapContext = getContext<MapContext>('map');
     const { map } = mapContext;
@@ -16,13 +16,22 @@
 
     // fly to building on activate
     $: {
-        if (building && !loading) {
-            $map.flyTo({
-                center: { lat: building.lat, lng: building.lng },
-                pitch: 0,
-                zoom: 18,
-                padding: getSidebarAwareMapPadding(),
-            });
+        if ($map && !loading) {
+            if (building) {
+                $map.flyTo({
+                    center: { lat: building.lat, lng: building.lng },
+                    pitch: 45,
+                    zoom: 18,
+                    padding: getSidebarAwareMapPadding(),
+                });
+            } else {
+                $map.flyTo({
+                    center: $map.getCenter(),
+                    pitch: 0,
+                    zoom: $map.getZoom(),
+                    padding: getStandardPadding(),
+                })
+            }
         }
     }
 

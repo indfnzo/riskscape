@@ -11,9 +11,9 @@
 	import { onMount, setContext } from 'svelte';
 	import mapboxgl, { Map, Marker, Popup } from 'mapbox-gl';
 	import { writable } from 'svelte/store';
-	import { buildings, buildingsSearchState, selectedBuilding, selectBuilding } from '$lib/stores';
+	import { buildings, buildingsSearchState, selectBuilding } from '$lib/stores';
 	import type { Building } from '@prisma/client';
-	import { getSidebarAwareMapPadding, getStandardPadding } from '$lib/helpers';
+	import { getSidebarAwareMapPadding, getStandardPadding, isTouchDevice } from '$lib/helpers';
 
 	export let fullscreen = false;
 
@@ -43,12 +43,19 @@
 			const el = document.createElement('button');
 			el.className = 'building-marker zone-' + bldg.seismicZone;
 			el.title = bldg.name;
+
+			const pinEl = document.createElement('div');
+			pinEl.className = 'marker-pin';
+			el.appendChild(pinEl);
+
 			const center = { lat: bldg.lat, lng: bldg.lng };
 			const marker = new Marker(el).setLngLat(center).setPopup(popup).addTo($map);
 
 			// show popup on hover
-			el.addEventListener('mouseenter', () => popup.addTo($map));
-			el.addEventListener('mouseleave', () => popup.remove());
+			if (!isTouchDevice()) {
+				el.addEventListener('mouseenter', () => popup.addTo($map));
+				el.addEventListener('mouseleave', () => popup.remove());
+			}
 
 			// disable double click to zoom
 			el.addEventListener('dblclick', (evt) => {
@@ -141,10 +148,15 @@
 			[120.988718, 14.778065]
 		], {
 			animate: false,
-			pitch: 45,
+			pitch: 0,
 			center: [121.04932076975197, 14.651491937004637]
 		});
 		$map.zoomIn({ animate: false });
+
+		// disable satellite view
+		$map.once('styledata', () => {
+			$map.setLayoutProperty('mapbox-satellite', 'visibility', 'none');
+		});
 	});
 
 	// hide everything and prompt for a manual location selection
@@ -199,7 +211,7 @@
 
 <div bind:this={container} class="map-view" class:fullscreen></div>
 
-<div class="map-elements" class:hide={promptMode}><slot></slot></div>
+<div class="map-elements" class:hide={promptMode}><slot map={map}></slot></div>
 
 <div class="map-prompt-controls" class:hide={!promptMode}>
 	<div class="prompt-crosshair"></div>
@@ -232,38 +244,50 @@
 	/* custom building markers */
 
 	:global(.building-marker) {
-		display: block;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		margin: 0;
 		padding: 0;
 		appearance: none;
+		width: 3rem;
+		height: 3rem;
+		background: none;
+		border: none;
+		cursor: pointer;
+	}
+
+	:global(.building-marker .marker-pin) {
 		width: 1rem;
 		height: 1rem;
 		border: 2px solid rgb(255 255 255 / 50%);
 		background: black;
 		border-radius: 50%;
 		box-shadow: 0 0 0 1px rgb(0 0 0 / 25%) inset, 0 3px 5px rgb(0 0 0 / 50%);
-		cursor: pointer;
 		
 		transition-property: width, height, border, background, box-shadow;
 		transition-duration: 100ms;
 		transition-timing-function: ease-out;
 	}
 
-	:global(.building-marker.zone-2) {
+	:global(.building-marker.zone-2 .marker-pin) {
 		background: var(--theme-seismic-zone-2);
 	}
 
-	:global(.building-marker.zone-4) {
+	:global(.building-marker.zone-4 .marker-pin) {
 		background: var(--theme-seismic-zone-4);
 	}
 
 	:global(.building-marker.hidden) {
+		pointer-events: none !important;
+	}
+
+	:global(.building-marker.hidden .marker-pin) {
 		width: 0.25rem;
 		height: 0.25rem;
 		border: none;
 		background: rgb(255 255 255 / 50%);
 		box-shadow: none;
-		pointer-events: none !important;
 	}
 
 	/* building popups */

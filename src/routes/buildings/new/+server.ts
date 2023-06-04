@@ -7,7 +7,7 @@ export async function POST({ request }) {
 
     // manual validation
     if (!data.name) throw error(400, 'Please specify building name.');
-    if (!data.address || !data.zipCode) throw error(400, 'Please specify building address and ZIP code.');
+    if (!data.address) throw error(400, 'Please specify building address.');
     if (!data.contactName || !data.contactPhone) throw error(400, 'Building contact details are required.');
 
     if (

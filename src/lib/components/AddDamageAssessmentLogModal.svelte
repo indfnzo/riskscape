@@ -51,6 +51,9 @@
 
     const addDamageAssessmentLog = async () => {
         if (saving) return;
+
+        if (!confirm('Are you sure you want to submit this damage assessment? You won\'t be able to update or delete this entry once submitted.')) return;
+
         saving = true;
 
         // prep payload

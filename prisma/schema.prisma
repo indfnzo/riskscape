@@ -49,4 +49,27 @@ model AssessmentLog {
   contactEmail String
 
   formCompletionDuration Int
+
+  assessmentLogImages AssessmentLogImage[]
+}
+
+model AssessmentLogImage {
+  assessmentLog   AssessmentLog @relation(fields: [assessmentLogId], references: [id])
+  assessmentLogId Int
+
+  image   Image @relation(fields: [imageId], references: [id])
+  imageId Int
+
+  @@unique([assessmentLogId, imageId])
+}
+
+model Image {
+  id Int @id @default(autoincrement())
+
+  fileName String
+  mimeType String
+  fileSize Int
+  data     Bytes
+
+  assessmentLogImages AssessmentLogImage[]
 }

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { Building } from '@prisma/client';
-	import { Button, CheckboxPanel, Input, Modal, ModalContext, NumberInput, SectionalForm, Select, TextArea } from '.';
-	import { defaultInspectionScope, defaultDamageAssessmentLogData, selectBuilding, type AssessmentLogData, type DamageAssessmentLog } from '$lib/stores';
-	import { BUILDING_CONDITION_FLAGS, BUILDING_DAMAGE_INDICATORS, BUILDING_DAMAGE_LEVELS, BUILDING_DESIGN_CHANGE_TYPES, BUILDING_DISTRESS_TYPES, BUILDING_MATERIALS, BUILDING_SAFETY_EVALUATION_CONDITIONS, getRiseCode, getVintage } from '$lib/helpers';
+	import { Button, CheckboxPanel, ImageUploader, Input, Modal, ModalContext, SectionalForm, Select, TextArea } from '.';
+	import { defaultInspectionScope, defaultDamageAssessmentLogData, selectBuilding, type AssessmentLogData, type DamageAssessmentLog, type ImageData } from '$lib/stores';
+	import { BUILDING_DAMAGE_INDICATORS, BUILDING_DAMAGE_LEVELS, BUILDING_MATERIALS, BUILDING_SAFETY_EVALUATION_CONDITIONS } from '$lib/helpers';
 	import prettyMilliseconds from 'pretty-ms';
 	import { slide } from 'svelte/transition';
 
@@ -21,12 +21,15 @@
 
     let formCompletionStart = new Date().getTime();
 
+    let images: ImageData[] = [];
+
     const resetForm = () => {
         if (preview) {
             log = preview;
             inspectionScope = preview.inspectionScope;
             data = preview.inspectionData;
             activeIndicatorsDescription = '';
+            images = preview.images;
         } else {
             log = { type: 'post' };
             inspectionScope = defaultInspectionScope;
@@ -34,6 +37,8 @@
             activeIndicatorsDescription = '';
 
             formCompletionStart = new Date().getTime();
+
+            images = [];
         }
     }
 
@@ -56,6 +61,7 @@
             inspectionData: {
                 ...data
             },
+            imageIds: images.map(img => img.id)
         };
 
         const response = await fetch(`/buildings/${building.id}/addDamageAssessmentLog`, {
@@ -68,7 +74,7 @@
         if (response.ok) {
             resetForm();
             modalContext.modal.close();
-            setTimeout(() => selectBuilding(building, true), 500);
+            setTimeout(() => selectBuilding(building, true), 600);
         } else {
             error = res.message || 'Failed to submit damage assessment.';
         }
@@ -313,6 +319,12 @@
                     <hr />
 
                     <TextArea label="Other Comments" bind:value={data.generalRemarks} placeholder="Other comments/recommendations" {disabled} />
+                </main>
+            </section>
+            <section>
+                <aside><h3>Image References</h3></aside>
+                <main>
+                    <ImageUploader bind:images preview={preview != null} />
                 </main>
             </section>
             <section>

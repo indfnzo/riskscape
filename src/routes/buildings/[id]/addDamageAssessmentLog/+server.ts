@@ -26,6 +26,7 @@ export async function POST({ params, request }) {
     if (!v.safetyEvaluation) throw error(400, 'Please specify safety evaluation options.');
     if (!v.finalPosting) throw error(400, 'Please indicate final posting.');
 
+    const imageIds = data.imageIds ?? [];
 
     try {
         const log = await prisma.assessmentLog.create({
@@ -46,6 +47,10 @@ export async function POST({ params, request }) {
                 contactEmail: data.contactEmail,
 
                 formCompletionDuration: data.formCompletionDuration || 0,
+
+                assessmentLogImages: {
+                    create: imageIds.map(imageId => ({ imageId }))
+                }
             }
         });
         return new Response(JSON.stringify(log), {

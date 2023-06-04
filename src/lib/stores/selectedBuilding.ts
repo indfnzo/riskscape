@@ -1,13 +1,14 @@
 import { get, writable } from 'svelte/store';
 import type { AssessmentLog, Building } from '@prisma/client';
 import type {
-    BuildingConditions, BuildingDamageLevel, BuildingDamageIndicatorArea,
+    BuildingDamageLevel, BuildingDamageIndicatorArea,
     BuildingSafetyEvaluationCondition, BuildingSafetyEvaluationSeverity, BuildingFinalPosting
 } from '$lib/helpers';
 
 export type SelectedBuilding = {
     loading: boolean;
     building: Building;
+    images: ImageData[];
     vulnerabilityAssessmentLogs: VulnerabilityAssessmentLog[];
     damageAssessmentLogs: DamageAssessmentLog[];
 };
@@ -32,6 +33,14 @@ export const defaultInspectionScope: InspectionScope = {
     }
 };
 
+export type ImageData = {
+    id: number;
+    fileName: string;
+    mimeType: string;
+    fileSize: number;
+    url: string;
+};
+
 export type AssessmentLogData = {
     id: number,
     buildingId: number,
@@ -49,6 +58,9 @@ export type AssessmentLogData = {
     contactEmail: string,
 
     formCompletionDuration: number,
+
+    images: ImageData[], // receive
+    imageIds: number[], // send
 };
 
 export type VulnerabilityAssessmentLogData = {
@@ -219,6 +231,7 @@ export const selectBuilding = async (building: Building | null, forceReload = fa
     selectedBuilding.set({
         loading: true,
         building,
+        images: [],
         vulnerabilityAssessmentLogs: [],
         damageAssessmentLogs: [],
     });
@@ -233,12 +246,15 @@ export const selectBuilding = async (building: Building | null, forceReload = fa
     selectedBuilding.set({
         loading: false,
         building: data,
+        images: parseBuildingImages(data.assessmentLogs),
         vulnerabilityAssessmentLogs: parseVulnerabilityAssessmentLogs(data.assessmentLogs),
         damageAssessmentLogs: parseDamageAssessmentLogs(data.assessmentLogs),
     });
 }
 
-const parseVulnerabilityAssessmentLogs = (logs: AssessmentLog[]): VulnerabilityAssessmentLog[] => {
+type AssessmentLogWithImages = AssessmentLog & { images: ImageData[] };
+
+const parseVulnerabilityAssessmentLogs = (logs: AssessmentLogWithImages[]): VulnerabilityAssessmentLog[] => {
     return logs
         .filter(log => log.type === 'pre')
         .map(log => {
@@ -246,14 +262,15 @@ const parseVulnerabilityAssessmentLogs = (logs: AssessmentLog[]): VulnerabilityA
                 ...log,
                 inspectionDate: new Date(log.inspectionDate),
                 inspectionScope: JSON.parse(log.inspectionScope),
-                inspectionData: JSON.parse(log.inspectionData)
+                inspectionData: JSON.parse(log.inspectionData),
+                imageIds: log.images.map(img => img.id)
             };
 
             return data;
         });
 }
 
-const parseDamageAssessmentLogs = (logs: AssessmentLog[]): DamageAssessmentLog[] => {
+const parseDamageAssessmentLogs = (logs: AssessmentLogWithImages[]): DamageAssessmentLog[] => {
     return logs
         .filter(log => log.type === 'post')
         .map(log => {
@@ -261,9 +278,16 @@ const parseDamageAssessmentLogs = (logs: AssessmentLog[]): DamageAssessmentLog[]
                 ...log,
                 inspectionDate: new Date(log.inspectionDate),
                 inspectionScope: JSON.parse(log.inspectionScope),
-                inspectionData: JSON.parse(log.inspectionData)
+                inspectionData: JSON.parse(log.inspectionData),
+                imageIds: log.images.map(img => img.id)
             };
 
             return data;
         });
+}
+
+const parseBuildingImages = (logs: AssessmentLogWithImages[]): ImageData[] => {
+    let images: ImageData[] = [];
+    for (const log of logs) images = [...images, ...log.images];
+    return images;
 }

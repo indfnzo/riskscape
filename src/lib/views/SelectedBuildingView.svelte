@@ -12,6 +12,7 @@
 
     $: loading = $selectedBuilding?.loading;
     $: building = $selectedBuilding?.building;
+    $: images = $selectedBuilding?.images || [];
 
     // fly to building on activate
     $: {
@@ -29,6 +30,10 @@
         selectBuilding(null);
     }
 </script>
+
+<svelte:head>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-element-bundle.min.js"></script>
+</svelte:head>
 
 {#if building}
     <div
@@ -53,6 +58,14 @@
                     {/if}
                 </button>
                 <h2 class="title">{building.name}</h2>
+
+                <swiper-container>
+                    {#each images as img}
+                        <swiper-slide>
+                            <img src={img.url} alt={img.fileName}>
+                        </swiper-slide>
+                    {/each}
+                  </swiper-container>
             </div>
             <div class="details-section">
                 <div class="detail-row">
@@ -171,7 +184,7 @@
 
     .media-section {
         position: relative;
-        padding: 6rem 2rem 1rem;
+        padding: 10rem 2rem 1rem;
         color: white;
         z-index: 1;
     }
@@ -184,8 +197,9 @@
         bottom: 0;
         right: 0;
         height: 100%;
-        background: linear-gradient(to bottom, rgb(26 26 26 / 0%), rgb(26 26 26 / 50%));
+        background: linear-gradient(to bottom, rgb(26 26 26 / 50%), rgb(26 26 26 / 75%));
         z-index: -1;
+        pointer-events: none;
     }
 
     .back-button {
@@ -233,6 +247,23 @@
         font-size: 1.75rem;
         font-weight: 700;
         line-height: 1.25;
+    }
+
+    swiper-container {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        z-index: -1;
+    }
+
+    swiper-slide img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
     }
 
     .details-section {

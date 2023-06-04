@@ -144,6 +144,7 @@
 			pitch: 45,
 			center: [121.04932076975197, 14.651491937004637]
 		});
+		$map.zoomIn({ animate: false });
 	});
 
 	// hide everything and prompt for a manual location selection

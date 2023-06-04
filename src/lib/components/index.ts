@@ -17,3 +17,4 @@ export { default as CheckboxPanel } from './CheckboxPanel.svelte';
 
 export { default as AddVulnerabilityAssessmentLogModal } from './AddVulnerabilityAssessmentLogModal.svelte';
 export { default as AddDamageAssessmentLogModal } from './AddDamageAssessmentLogModal.svelte';
+export { default as ImageUploader } from './ImageUploader.svelte';

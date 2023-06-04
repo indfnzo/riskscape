@@ -31,7 +31,7 @@ export async function POST({ params, request }) {
         const log = await prisma.assessmentLog.create({
             data: {
                 buildingId: building.id,
-                type: 'pre',
+                type: 'post',
 
                 inspectionDate: new Date(),
                 inspectorName: data.inspectorName,

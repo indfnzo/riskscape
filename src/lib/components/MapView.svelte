@@ -19,7 +19,7 @@
 
 	let container: HTMLElement;
 	let map = writable<Map>();
-	let buildingMarkers: Record<number, { marker: Marker, popup: Popup }> = {};
+	let buildingMarkers: Record<number, { marker: Marker }> = {};
 
 	// rerender all building markers & popups
 	const updateMarkers = (bldgs: Building[]) => {
@@ -29,17 +29,6 @@
 
 		// rerender markers & popups
 		for (const bldg of bldgs) {
-			const popup = new Popup({ offset: 16, className: 'building-popup' }).setHTML(`
-				<div class="content">
-					<div class="name">${bldg.name}</div>
-					<div class="address">${bldg.address}</div>
-				</div>
-				<div class="meta">
-					<strong class="zone zone-${bldg.seismicZone}">Zone ${bldg.seismicZone}</strong>
-					(${bldg.distanceFromFaultLine}km)
-				</div>
-			`);
-
 			const el = document.createElement('button');
 			el.className = 'building-marker zone-' + bldg.seismicZone;
 			el.title = bldg.name;
@@ -49,10 +38,23 @@
 			el.appendChild(pinEl);
 
 			const center = { lat: bldg.lat, lng: bldg.lng };
-			const marker = new Marker(el).setLngLat(center).setPopup(popup).addTo($map);
+			const marker = new Marker(el).setLngLat(center).addTo($map);
 
-			// show popup on hover
+			// set up popup for non-touch devices
 			if (!isTouchDevice()) {
+				const popup = new Popup({ offset: 16, className: 'building-popup' }).setHTML(`
+					<div class="content">
+						<div class="name">${bldg.name}</div>
+						<div class="address">${bldg.address}</div>
+					</div>
+					<div class="meta">
+						<strong class="zone zone-${bldg.seismicZone}">Zone ${bldg.seismicZone}</strong>
+						(${bldg.distanceFromFaultLine}km)
+					</div>
+				`);
+
+				marker.setPopup(popup);
+
 				el.addEventListener('mouseenter', () => popup.addTo($map));
 				el.addEventListener('mouseleave', () => popup.remove());
 			}
@@ -69,7 +71,7 @@
 				evt.preventDefault();
 			});
 
-			buildingMarkers[bldg.id] = { marker, popup };
+			buildingMarkers[bldg.id] = { marker };
 		}
 	}
 

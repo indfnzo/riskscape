@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { getContext } from 'svelte';
+    import { getContext, onMount } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
 	import { selectedBuilding, selectBuilding } from '$lib/stores';
@@ -38,6 +38,13 @@
     const closeBuilding = () => {
         selectBuilding(null);
     }
+
+    let swiper: HTMLElement & { initialize: () => void };
+    $: {
+        if (!loading && building) setTimeout(() => {
+            swiper.initialize();
+        }, 500)
+    }
 </script>
 
 <svelte:head>
@@ -68,13 +75,13 @@
                 </button>
                 <h2 class="title">{building.name}</h2>
 
-                <swiper-container>
+                <swiper-container bind:this={swiper} init="false" loop="true">
                     {#each images as img}
                         <swiper-slide>
                             <img src={img.url} alt={img.fileName}>
                         </swiper-slide>
                     {/each}
-                  </swiper-container>
+                </swiper-container>
             </div>
             <div class="details-section">
                 <div class="detail-row">
@@ -265,6 +272,12 @@
         top: 0;
         bottom: 0;
         z-index: -1;
+        transition: all 500ms ease;
+        opacity: 0;
+    }
+
+    swiper-container:global(.swiper-initialized) {
+        opacity: 1;
     }
 
     swiper-slide img {

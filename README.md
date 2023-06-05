@@ -1,4 +1,18 @@
-# create-svelte
+# ![](./static/favicon.png) RiskScape
+
+![](./static/aff.png)
+
+<div style="display: flex; align-items: center; justify-content: center;">
+    <div>
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="./static/favicon.png">
+            <source media="(prefers-color-scheme: light)" srcset="./static/favicon.png">
+            <img alt="YOUR-ALT-TEXT" src="./static/favicon.png">
+        </picture>
+        <h1>RiskScape</h1>
+    </div>
+    <img alt="YOUR-ALT-TEXT" src="./static/aff.png">
+</div>
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
 

@@ -1,12 +1,8 @@
-<h1>
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./static/favicon.png">
-        <source media="(prefers-color-scheme: light)" srcset="./static/favicon.png">
-        <img alt="YOUR-ALT-TEXT" src="./static/favicon.png">
-    </picture>
-    RiskScape
-    <img alt="YOUR-ALT-TEXT" src="./static/aff.png">
-</h1>
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="/static/gh-banner-dark.png">
+    <source media="(prefers-color-scheme: light)" srcset="/static/gh-banner-light.png">
+    <img alt="RiskScape" src="/static/gh-banner-gray.png">
+</picture>
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
 

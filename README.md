@@ -37,7 +37,7 @@ You can preview the production build with `npm run preview`.
 
 ## Deployment
 
-The ![staging environment](https://riskscape.ndfnz.io/) was hosted on DigitalOcean using ![pm2](https://github.com/Unitech/pm2) and nginx.
+The [staging environment](https://riskscape.ndfnz.io/) was hosted on DigitalOcean using [pm2](https://github.com/Unitech/pm2) and nginx.
 
 The general flow for setting this up on a VPS would look something like this:
 

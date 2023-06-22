@@ -123,7 +123,7 @@
     }
 </script>
 
-<ModalContext bind:this={modalContext} let:modal on:close={resetForm}>
+<ModalContext bind:this={modalContext} let:modal on:close={() => { if (editing) resetForm(); }}>
     <slot {modal}></slot>
 
     <Modal context={modal}>

@@ -11,6 +11,6 @@
 	export let required = false;
 </script>
 
-<FormControl {label} let:id>
+<FormControl {label} let:id {required}>
 	<input {id} type="number" bind:value {name} {placeholder} {disabled} {step} {required} />
 </FormControl>

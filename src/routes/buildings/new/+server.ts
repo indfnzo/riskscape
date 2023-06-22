@@ -18,7 +18,7 @@ export async function POST({ request }) {
         throw error(400, 'Building coordinates out of bounds.');
     }
 
-    if (!data.seismicZone || !data.soilType) throw error(400, 'Please specify building seismic zone and soil type.');
+    if (!data.seismicZone) throw error(400, 'Please specify building seismic zone.');
 
     try {
         const building = await prisma.building.create({ data: data as Building });

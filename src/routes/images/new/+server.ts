@@ -9,6 +9,7 @@ export async function POST({ request }) {
         const imageData = Buffer.from(await image.arrayBuffer());
 
         const processedImage = await sharp(imageData)
+            .rotate()
             .resize({ width: 1280, height: 720, fit: 'outside', withoutEnlargement: true })
             .toBuffer();
 

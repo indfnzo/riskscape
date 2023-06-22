@@ -6,6 +6,7 @@
 	import type { MapContext } from '$lib/components';
 	import { AssessmentTabView } from '$lib/views';
 	import { SEISMIC_ZONES, SOIL_TYPES, getSidebarAwareMapPadding, getStandardPadding } from '$lib/helpers';
+	import NewBuildingModal from '$lib/components/NewBuildingModal.svelte';
 
     const mapContext = getContext<MapContext>('map');
     const { map } = mapContext;
@@ -73,7 +74,14 @@
                         </svg>
                     {/if}
                 </button>
-                <h2 class="title">{building.name}</h2>
+                <h2 class="title">
+                    {building.name}
+                    {#if building && !loading}
+                        <NewBuildingModal editBuilding={building} let:modal>
+                            <button type="button" class="edit-building-button" on:click={modal.open}>Edit</button>
+                        </NewBuildingModal>
+                    {/if}
+                </h2>
 
                 <swiper-container bind:this={swiper} init="false" loop="true">
                     {#each images as img}
@@ -286,6 +294,29 @@
         height: 100%;
         object-fit: cover;
         object-position: center;
+    }
+
+    .edit-building-button {
+        display: inline-block;
+        margin: 0 0.5rem;
+        padding: 0 0.75rem;
+        font-size: 0.9rem;
+        line-height: 1.5rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        appearance: none;
+        background: white;
+        color: black;
+        border: none;
+        border-radius: 2rem;
+        cursor: pointer;
+        vertical-align: middle;
+        transition: all 100ms ease;
+    }
+
+    .edit-building-button:hover,
+    .edit-building-button:focus {
+        background: rgb(255 255 255 / 75%);
     }
 
     .details-section {

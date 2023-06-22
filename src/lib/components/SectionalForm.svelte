@@ -1,8 +1,9 @@
 <script lang="ts">
+    export let editMode = false;
     export let onSubmit: (evt: SubmitEvent) => void;
 </script>
 
-<form class="sectional-form" on:submit={onSubmit}>
+<form class="sectional-form" class:edit-mode={editMode} on:submit={onSubmit}>
     <slot></slot>
 </form>
 
@@ -143,5 +144,12 @@
     .sectional-form :global(.form-control:has(:disabled) label) {
         color: var(--theme-accent);
         opacity: 0.75;
+    }
+
+    .sectional-form.edit-mode :global(.form-control :disabled),
+    .sectional-form.edit-mode :global(.form-control:has(:disabled) label),
+    .sectional-form.edit-mode :global(.checkbox-panel:disabled),
+    .sectional-form.edit-mode :global(.select-list-item:disabled:not(.active)) {
+        background: #f7f7f7;
     }
 </style>

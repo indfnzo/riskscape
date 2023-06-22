@@ -52,7 +52,12 @@
 	:global(.button-group) {
 		display: flex;
 		flex-wrap: wrap;
+		align-items: center;
 		gap: 1rem;
+	}
+
+	:global(.button-group.space-between) {
+		justify-content: space-between;
 	}
 
 	:global(.button-group.right) {

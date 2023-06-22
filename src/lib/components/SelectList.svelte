@@ -2,6 +2,7 @@
 	import type { Writable } from 'svelte/store';
 	export type SelectListContext = {
 		valueStore: Writable<string>,
+		disabledStore: Writable<boolean>,
 		setValue: (value: string) => void
 	};
 </script>
@@ -13,12 +14,20 @@
 	export let label = '';
 	export let value = '';
 
+	export let required = false;
+	export let disabled = false;
+
 	let valueStore = writable('');
 	$: $valueStore = value;
 
+	let disabledStore = writable(false);
+	$: $disabledStore = disabled;
+
 	setContext<SelectListContext>('selectList', {
 		valueStore,
+		disabledStore,
 		setValue: (v) => {
+			if (disabled) return;
 			value = v;
 		}
 	});
@@ -26,8 +35,16 @@
 
 <div class="select-list">
 	<div class="label">
-		<strong>{label}</strong>
-		(pick one)
+		<strong>
+			{label}
+
+			{#if required}
+				<span class="required">*</span>
+			{/if}
+		</strong>
+		{#if !disabled}
+			(pick one)
+		{/if}
 	</div>
 	<slot></slot>
 </div>
@@ -47,5 +64,9 @@
 	.label strong {
 		font-weight: 700;
 		color: black;
+	}
+
+	.required {
+		color: var(--theme-error);
 	}
 </style>

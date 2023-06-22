@@ -15,6 +15,7 @@ export { default as SelectList } from './SelectList.svelte';
 export { default as SelectListItem } from './SelectListItem.svelte';
 export { default as CheckboxPanel } from './CheckboxPanel.svelte';
 
+export { default as NewBuildingModal } from './NewBuildingModal.svelte';
 export { default as AddVulnerabilityAssessmentLogModal } from './AddVulnerabilityAssessmentLogModal.svelte';
 export { default as AddDamageAssessmentLogModal } from './AddDamageAssessmentLogModal.svelte';
 export { default as ImageUploader } from './ImageUploader.svelte';

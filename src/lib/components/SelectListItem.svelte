@@ -4,6 +4,7 @@
 
 	const context = getContext<SelectListContext>('selectList');
 	const currentValue = context.valueStore;
+	const currentDisabled = context.disabledStore;
 
 	export let value = '';
 	export let title = '';
@@ -13,7 +14,7 @@
 	}
 </script>
 
-<button type="button" class="select-list-item" class:active={$currentValue === value} on:click={setValue}>
+<button type="button" class="select-list-item" disabled={$currentDisabled} class:active={$currentValue === value} on:click={setValue}>
 	<div class="image">
 		<slot name="image"></slot>
 	</div>

@@ -5,10 +5,25 @@
 	import { defaultInspectionScope, defaultDamageAssessmentLogData, selectBuilding, type AssessmentLogData, type DamageAssessmentLog, type ImageData } from '$lib/stores';
 	import { BUILDING_DAMAGE_INDICATORS, BUILDING_DAMAGE_LEVELS, BUILDING_MATERIALS, BUILDING_SAFETY_EVALUATION_CONDITIONS } from '$lib/helpers';
 	import prettyMilliseconds from 'pretty-ms';
+    import { DateTime } from 'luxon';
 	import { slide } from 'svelte/transition';
 
     export let building: Building;
     export let preview: DamageAssessmentLog | null = null;
+
+    export let editMode = false;
+
+    const now = new Date().getTime();
+    const limit = 1000 * 60 * 60 * 24 * 14; // 14 days
+    let editableUntil: string | null = null;
+    let editLocked = false;
+    $: {
+        if (preview?.inspectionDate) {
+            const until = new Date(now + limit);
+            editableUntil = until.toDateString();
+            editLocked = now - preview.inspectionDate.getTime() >= limit;
+        }
+    }
 
     let modalContext: ModalContext;
 
@@ -30,6 +45,7 @@
             data = preview.inspectionData;
             activeIndicatorsDescription = '';
             images = preview.images;
+            editMode = false;
         } else {
             log = { type: 'post' };
             inspectionScope = defaultInspectionScope;
@@ -52,7 +68,7 @@
     const addDamageAssessmentLog = async () => {
         if (saving) return;
 
-        if (!confirm('Are you sure you want to submit this damage assessment? You won\'t be able to update or delete this entry once submitted.')) return;
+        if (!preview && !confirm('Are you sure you want to submit this damage assessment? You won\'t be able to update or delete this entry once submitted.')) return;
 
         saving = true;
 
@@ -67,7 +83,9 @@
             imageIds: images.map(img => img.id)
         };
 
-        const response = await fetch(`/buildings/${building.id}/addDamageAssessmentLog`, {
+        const url = preview && editMode ? `/buildings/${building.id}/updateDamageAssessmentLog/${preview.id}` : `/buildings/${building.id}/addDamageAssessmentLog`;
+
+        const response = await fetch(url, {
             method: 'POST',
             body: JSON.stringify(payload),
         });
@@ -98,7 +116,7 @@
 <ModalContext bind:this={modalContext} let:modal actionRequired={preview == null}>
     <slot {modal}></slot>
     <Modal>
-        <SectionalForm onSubmit={addDamageAssessmentLog}>
+        <SectionalForm onSubmit={addDamageAssessmentLog} {editMode}>
             <section>
                 <aside>
                     <button type="button" class="cancel-button" on:click={cancel}>
@@ -114,6 +132,27 @@
                         <div class="subtitle">
                             <strong>{log.inspectionDate?.toDateString()}</strong>
                             <span>{prettyMilliseconds(log.formCompletionDuration || 0)}</span>
+                        </div>
+                    {/if}
+                    {#if preview != null && !editLocked}
+                        <hr>
+                        <div>
+                            {#if editMode}
+                                {#if error}
+                                    <div class="error" style="margin-bottom: 1rem;">{error}</div>
+                                {/if}
+                                <div class="button-group space-between items-center">
+                                    <Button secondary onClick={() => { editMode = false; }}>Cancel</Button>
+                                    <Button type="submit" disabled={saving}>Save Changes</Button>
+                                </div>
+                            {:else}
+                                <div class="button-group space-between items-center">
+                                    <div class="text">
+                                        Some fields are editable until <strong>{editableUntil}</strong>.
+                                    </div>
+                                    <Button secondary onClick={() => { editMode = true; }}>Edit Assessment</Button>
+                                </div>
+                            {/if}
                         </div>
                     {/if}
                 </main>
@@ -143,14 +182,20 @@
 
                     <h4>Drawings Reviewed</h4>
                     <div class="control-group">
-                        <CheckboxPanel bind:checked={inspectionScope.drawings.structuralPlans} {disabled}>
+                        <CheckboxPanel bind:checked={inspectionScope.drawings.structuralPlans} disabled={disabled && !editMode}>
                             Structural Plans
                         </CheckboxPanel>
-                        <CheckboxPanel bind:checked={inspectionScope.drawings.architecturalPlans} {disabled}>
+                        <CheckboxPanel bind:checked={inspectionScope.drawings.architecturalPlans} disabled={disabled && !editMode}>
                             Architectural Plans
                         </CheckboxPanel>
                     </div>
-                    <Input label="Other Drawings" bind:value={inspectionScope.drawings.other} placeholder="Leave blank if no other drawings reviewed." {disabled} />
+                    <Input label="Other Drawings" bind:value={inspectionScope.drawings.other} placeholder="Leave blank if no other drawings reviewed." disabled={disabled && !editMode} />
+                </main>
+            </section>
+            <section>
+                <aside><h3>Image References</h3></aside>
+                <main>
+                    <ImageUploader bind:images preview={preview != null} />
                 </main>
             </section>
             <section>
@@ -160,13 +205,11 @@
                         <Select label="Building Material" bind:value={data.buildingMaterial} required {disabled} onChange={() => {
                             data.buildingStructuralType = '';
                         }}>
-                            <option value="" disabled>-</option>
                             {#each Object.entries(BUILDING_MATERIALS) as [value, mat]}
                                 <option {value}>{mat.name}</option>
                             {/each}
                         </Select>
                         <Select label="Structural Type" bind:value={data.buildingStructuralType} required {disabled}>
-                            <option value="" disabled>-</option>
                             {#each Object.entries(BUILDING_MATERIALS[data.buildingMaterial]?.structuralTypes ?? {}) as [value, text]}
                                 <option {value}>{text}</option>
                             {/each}
@@ -325,12 +368,6 @@
                 </main>
             </section>
             <section>
-                <aside><h3>Image References</h3></aside>
-                <main>
-                    <ImageUploader bind:images preview={preview != null} />
-                </main>
-            </section>
-            <section>
                 <aside><h3>Contact Details</h3></aside>
                 <main>
                     <Input label="Contact person/s in-charge" bind:value={log.contactName} required {disabled} />
@@ -353,14 +390,35 @@
                     </main>
                 </section>
             {:else}
-                <section>
-                    <aside></aside>
-                    <main>
-                        <div class="button-group right">
-                            <Button onClick={cancel}>Dismiss</Button>
-                        </div>
-                    </main>
-                </section>
+                {#if editMode}
+                    <section class="cta-row">
+                        <aside>
+                            <Button secondary onClick={cancel}>Dismiss</Button>
+                        </aside>
+                        <main>
+                            {#if error}
+                                <div class="error">{error}</div>
+                            {/if}
+                            <div class="button-group space-between">
+                                <Button secondary onClick={() => { editMode = false; }}>Cancel</Button>
+                                <Button type="submit" disabled={saving}>Save Changes</Button>
+                            </div>
+                        </main>
+                    </section>
+                {:else}
+                    <section class="cta-row">
+                        <aside>
+                            <Button secondary onClick={cancel}>Dismiss</Button>
+                        </aside>
+                        <main>
+                            {#if !editLocked}
+                                <div class="button-group right">
+                                    <Button secondary onClick={() => { editMode = true; }}>Edit Damage Assessment</Button>
+                                </div>
+                            {/if}
+                        </main>
+                    </section>
+                {/if}
             {/if}
         </SectionalForm>
     </Modal>

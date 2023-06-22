@@ -2,13 +2,19 @@
 	import { generateId } from '$lib/helpers';
 
 	export let label = '';
+	export let required = false;
 
 	const id = generateId('form-control');
 </script>
 
 <div class="form-control" class:has-label={label}>
 	{#if label}
-		<label for={id}>{label}</label>
+		<label for={id}>
+			{label}
+			{#if required}
+				<span class="required">*</span>
+			{/if}
+		</label>
 	{/if}
 	<slot {id}></slot>
 </div>
@@ -42,6 +48,10 @@
 	.form-control.has-label :global(textarea) {
 		padding-top: 1.75rem;
 		padding-bottom: 1rem;
+	}
+
+	.form-control :global(label .required) {
+		color: var(--theme-error);
 	}
 
 	/* field styles */

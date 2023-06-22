@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { prisma } from '$lib/server';
 import type { ImageData } from '$lib/stores';
-import type { AssessmentLog, AssessmentLogImage, Building, Image } from '@prisma/client';
+import type { AssessmentLog, Building } from '@prisma/client';
 
 export async function GET({ params }) {
     const id = parseInt(params.id);
@@ -54,4 +54,35 @@ export async function GET({ params }) {
             'Content-Type': 'application/json'
         }
     });
+}
+
+export async function POST({ params, request }) {
+    const id = parseInt(params.id);
+    if (isNaN(id)) throw error(400, 'Invalid building ID.');
+
+    const building = await prisma.building.findFirst({ where: { id } });
+    if (!building) throw error(400, 'Building not found.');
+
+    const data: Partial<Building> = await request.json();
+
+    try {
+        const building = await prisma.building.update({
+            where: {
+                id: id
+            },
+            data: {
+                zipCode: data.zipCode,
+                distanceFromFaultLine: data.distanceFromFaultLine,
+                soilType: data.soilType
+            }
+        });
+        return new Response(JSON.stringify(building), {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch(err) {
+        if (err instanceof Error) throw error(400, err.message);
+        throw error(400, 'Failed to update building record.');
+    }
 }

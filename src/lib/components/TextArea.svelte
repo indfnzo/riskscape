@@ -10,6 +10,6 @@
 	export let required = false;
 </script>
 
-<FormControl {label} let:id>
+<FormControl {label} let:id {required}>
 	<textarea {id} bind:value {name} {placeholder} {disabled} {required}></textarea>
 </FormControl>

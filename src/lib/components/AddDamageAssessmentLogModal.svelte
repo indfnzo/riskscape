@@ -5,7 +5,6 @@
 	import { defaultInspectionScope, defaultDamageAssessmentLogData, selectBuilding, type AssessmentLogData, type DamageAssessmentLog, type ImageData } from '$lib/stores';
 	import { BUILDING_DAMAGE_INDICATORS, BUILDING_DAMAGE_LEVELS, BUILDING_MATERIALS, BUILDING_SAFETY_EVALUATION_CONDITIONS } from '$lib/helpers';
 	import prettyMilliseconds from 'pretty-ms';
-    import { DateTime } from 'luxon';
 	import { slide } from 'svelte/transition';
 
     export let building: Building;
